@@ -130,6 +130,16 @@ const POPULAR_TICKERS: SearchResult[] = [
   { symbol: "360750.KS", name: "TIGER 미국S&P500", exchange: "코스피", type: "STOCK", region: "KR" },
 ]
 
+// 배당소득세율: 국내 상장 ETF 15.4%(지방세 포함), 미국 상장 15%(현지 원천징수)
+function dividendTaxRate(symbol: string): number {
+  return symbol.endsWith(".KS") || symbol.endsWith(".KQ") ? 0.154 : 0.15
+}
+
+// 세후 표시일 때 곱할 계수 (세전이면 1)
+function afterTaxFactor(symbol: string, afterTax: boolean): number {
+  return afterTax ? 1 - dividendTaxRate(symbol) : 1
+}
+
 export function ETFComparison() {
   const [exchangeRate, setExchangeRate] = useState(1280)
   const [symbols, setSymbols] = useState<string[]>([])
@@ -141,7 +151,9 @@ export function ETFComparison() {
   const [dividendChartType, setDividendChartType] = useState<"yearly" | "monthly">("yearly")
   const [chartType, setChartType] = useState<"returns" | "dividends">("returns")
   const [displayCurrency, setDisplayCurrency] = useState<"KRW" | "USD">("KRW")
-  
+  // 세후(배당소득세 반영) 배당금 표시 여부
+  const [afterTax, setAfterTax] = useState(false)
+
   // 투자 시뮬레이션 상태
   const [investmentAmounts, setInvestmentAmounts] = useState<Record<string, string>>({})
   
@@ -607,7 +619,7 @@ export function ETFComparison() {
 
               {/* Search Dropdown */}
               {isSearchOpen && symbols.length < 5 && (
-                <div className="absolute z-50 w-full mt-2 bg-card border border-border rounded-lg shadow-xl max-h-[340px] overflow-y-auto">
+                <div className="absolute z-50 w-full mt-2 bg-card border border-border rounded-xl shadow-xl max-h-[340px] overflow-y-auto">
                   {/* 검색어가 없을 때: 인기 종목 헤더 */}
                   {searchQuery.length === 0 && (
                     <div className="px-4 py-2 text-xs font-semibold text-muted-foreground bg-secondary/30 border-b border-border">
@@ -632,7 +644,7 @@ export function ETFComparison() {
                             isHighlighted ? "bg-secondary/60" : "hover:bg-secondary/50"
                           }`}
                         >
-                          <TickerLogo symbol={result.symbol} size={32} />
+                          <TickerLogo symbol={result.symbol} label={result.name} size={32} />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5">
                               <span className="font-semibold text-foreground truncate">
@@ -641,8 +653,8 @@ export function ETFComparison() {
                               <span
                                 className={`text-[10px] font-medium px-1.5 py-0.5 rounded flex-shrink-0 ${
                                   result.region === "KR"
-                                    ? "bg-blue-500/10 text-blue-600"
-                                    : "bg-orange-500/10 text-orange-600"
+                                    ? "bg-primary/10 text-primary"
+                                    : "bg-muted text-muted-foreground"
                                 }`}
                               >
                                 {result.region === "KR" ? "🇰🇷 한국" : "🇺🇸 미국"}
@@ -682,7 +694,7 @@ export function ETFComparison() {
                       key={symbol}
                       className="flex items-start gap-2.5 px-3 py-2.5 rounded-xl border border-border bg-card hover:border-primary/50 transition-colors min-w-0"
                     >
-                      <TickerLogo symbol={symbol} size={28} fallbackColor={COLORS[index]} />
+                      <TickerLogo symbol={symbol} label={data?.name} size={28} fallbackColor={COLORS[index]} />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
                           <span
@@ -909,7 +921,7 @@ export function ETFComparison() {
                       <div className="flex items-center justify-between mb-3 pb-3 border-b border-border">
                         <div className="flex items-center gap-2 min-w-0">
                           <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[index] }} />
-                          <TickerLogo symbol={symbol} size={28} fallbackColor={COLORS[index]} />
+                          <TickerLogo symbol={symbol} label={data?.name} size={28} fallbackColor={COLORS[index]} />
                           <div className="min-w-0">
                             <span className="font-bold text-lg text-foreground block leading-tight">{symbol}</span>
                             {data?.name && (
@@ -976,7 +988,7 @@ export function ETFComparison() {
                           <th key={symbol} className="pb-3 px-2 w-[160px] text-center">
                             <div className="flex items-center justify-center gap-1.5 mb-0.5">
                               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-                              <TickerLogo symbol={symbol} size={20} fallbackColor={COLORS[index]} />
+                              <TickerLogo symbol={symbol} label={data?.name} size={20} fallbackColor={COLORS[index]} />
                               <span className="font-bold text-foreground text-sm">{symbol}</span>
                             </div>
                             {data?.name && (
@@ -1090,6 +1102,25 @@ export function ETFComparison() {
                 <h2 className="text-base font-semibold text-foreground mb-2">투자 시뮬레이션 · 예상 배당금</h2>
                 <p className="text-xs text-muted-foreground hidden sm:block">종목별 투자금액을 입력하면 월별 예상 배당금이 실시간으로 반영됩니다</p>
               </div>
+              {/* 세전/세후 토글 */}
+              <div className="flex items-center gap-1 bg-secondary/50 rounded-lg p-1 flex-shrink-0">
+                <Button
+                  variant={!afterTax ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setAfterTax(false)}
+                  className="h-8 px-3 text-xs font-medium"
+                >
+                  세전
+                </Button>
+                <Button
+                  variant={afterTax ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setAfterTax(true)}
+                  className="h-8 px-3 text-xs font-medium"
+                >
+                  세후
+                </Button>
+              </div>
             </div>
 
             {/* Investment Simulation - Toss Style with Quantity Control */}
@@ -1104,7 +1135,7 @@ export function ETFComparison() {
                   const { shares } = calculateInvestment(symbol, data)
                   if (shares <= 0) return
                   totalInvested += shares * convertCurrency(data.currentPrice, data.currency, "KRW", exchangeRate)
-                  totalDividend += shares * convertCurrency(data.annualDividend, data.currency, "KRW", exchangeRate)
+                  totalDividend += shares * convertCurrency(data.annualDividend, data.currency, "KRW", exchangeRate) * afterTaxFactor(symbol, afterTax)
                 })
                 totalInvested = Math.round(totalInvested)
                 totalDividend = Math.round(totalDividend)
@@ -1123,7 +1154,7 @@ export function ETFComparison() {
                     {items.map((it) => (
                       <div
                         key={it.label}
-                        className={`rounded-xl p-3 sm:p-4 border ${it.accent ? "bg-primary/5 border-primary/20" : "bg-secondary/30 border-border/40"}`}
+                        className={`rounded-xl p-3 sm:p-4 border ${it.accent ? "bg-primary/5 border-primary/20" : "bg-secondary/30 border-border"}`}
                       >
                         <div className="text-[11px] sm:text-xs text-muted-foreground mb-1">{it.label}</div>
                         <div className={`text-base sm:text-xl font-bold tabular-nums truncate ${it.accent ? "text-primary" : "text-foreground"}`}>
@@ -1155,12 +1186,12 @@ export function ETFComparison() {
                   return (
                     <div 
                       key={symbol} 
-                      className="rounded-2xl bg-card border border-border/20 p-5 transition-all"
+                      className="rounded-2xl bg-card border border-border p-5 transition-all"
                     >
                       {/* Stock Header */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
-                          <TickerLogo symbol={symbol} size={40} fallbackColor={COLORS[index]} />
+                          <TickerLogo symbol={symbol} label={data?.name} size={40} fallbackColor={COLORS[index]} />
                           <div className="min-w-0">
                             <div className="text-base font-semibold text-foreground leading-tight">{symbol}</div>
                             {data?.name && (
@@ -1226,8 +1257,10 @@ export function ETFComparison() {
                             <span className="text-base font-semibold text-foreground tabular-nums">₩{actualInvested.toLocaleString()}</span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">연 배당금</span>
-                            <span className="text-lg font-bold text-primary tabular-nums">₩{annualDividend.toLocaleString()}</span>
+                            <span className="text-sm text-muted-foreground">연 배당금{afterTax ? " (세후)" : ""}</span>
+                            <span className="text-lg font-bold text-primary tabular-nums">
+                              ₩{Math.round(annualDividend * afterTaxFactor(symbol, afterTax)).toLocaleString()}
+                            </span>
                           </div>
                         </div>
                       )}
@@ -1237,7 +1270,7 @@ export function ETFComparison() {
               </div>
 
               {/* Monthly Dividend Section - Only months with dividends */}
-              <div className="rounded-2xl bg-card border border-border/20 p-6">
+              <div className="rounded-2xl bg-card border border-border p-5">
                 <div className="text-base font-semibold text-foreground mb-5">배당금은 이렇게 들어와요</div>
                 {(() => {
                   const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
@@ -1251,9 +1284,9 @@ export function ETFComparison() {
                         const dividendPerShare = data.dividendHistory
                           .filter(d => parseInt(d.date.substring(5, 7)) === idx + 1)
                           .reduce((sum, d) => sum + d.amount, 0)
-                        // 종목별 통화를 원화로 환산 (한국 종목은 이미 원화)
+                        // 종목별 통화를 원화로 환산 (한국 종목은 이미 원화) + 세후 반영
                         const dividendKRW = convertCurrency(dividendPerShare, data.currency, "KRW", exchangeRate)
-                        const symbolKRW = shares * dividendKRW
+                        const symbolKRW = shares * dividendKRW * afterTaxFactor(symbol, afterTax)
                         if (symbolKRW > 0) {
                           bySymbol[symbol] = symbolKRW
                           monthKRWTotal += symbolKRW
@@ -1336,10 +1369,16 @@ export function ETFComparison() {
                       ))}
 
                       {/* Total Summary */}
-                      <div className="pt-4 mt-4 border-t border-border/20 flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">연간 총 배당금</span>
+                      <div className="pt-4 mt-4 border-t border-border flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">연간 총 배당금{afterTax ? " (세후)" : ""}</span>
                         <span className="text-xl font-bold text-primary tabular-nums">₩{totalAnnual.toLocaleString()}</span>
                       </div>
+
+                      {afterTax && (
+                        <p className="text-[11px] text-muted-foreground leading-relaxed pt-1">
+                          세후 기준: 국내 상장 ETF 배당소득세 15.4%, 미국 상장 ETF 현지 원천징수 15% 적용(개략치). 금융소득종합과세·환율 등은 미반영이며 실제와 차이가 있을 수 있습니다.
+                        </p>
+                      )}
                     </div>
                   )
                 })()}

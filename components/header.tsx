@@ -17,9 +17,15 @@ export function Header() {
         </Link>
 
         {/* 네비게이션 - 데스크톱 */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-7">
           <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             ETF 비교
+          </Link>
+          <Link href="/etf" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            ETF 모음
+          </Link>
+          <Link href="/tools/drip" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            배당 계산기
           </Link>
           <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             블로그
@@ -47,15 +53,29 @@ export function Header() {
       {isMenuOpen && (
         <nav className="md:hidden border-t border-border bg-card">
           <div className="px-4 py-4 space-y-3">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               ETF 비교
             </Link>
-            <Link 
-              href="/blog" 
+            <Link
+              href="/etf"
+              className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              ETF 모음
+            </Link>
+            <Link
+              href="/tools/drip"
+              className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              배당 계산기
+            </Link>
+            <Link
+              href="/blog"
               className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >

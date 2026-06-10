@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { blogPosts } from '@/lib/blog-posts'
+import { ETF_DIRECTORY, COMPARE_PAIRS, pairSlug } from '@/lib/etf-directory'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.etfflow.kr'
@@ -42,6 +43,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'yearly' as const,
       priority: 0.5,
     },
+    {
+      url: `${baseUrl}/etf`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/tools/dividend-goal`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/tools/drip`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    },
   ]
 
   // Dynamic blog posts - automatically includes all posts from blogPosts
@@ -52,5 +71,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }))
 
-  return [...staticPages, ...blogPages]
+  // ETF 종목별 상세 페이지
+  const etfPages = ETF_DIRECTORY.map((etf) => ({
+    url: `${baseUrl}/etf/${encodeURIComponent(etf.symbol)}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily' as const,
+    priority: 0.7,
+  }))
+
+  // ETF 1:1 비교 페이지
+  const comparePages = COMPARE_PAIRS.map(([a, b]) => ({
+    url: `${baseUrl}/compare/${pairSlug(a, b)}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }))
+
+  return [...staticPages, ...blogPages, ...etfPages, ...comparePages]
 }

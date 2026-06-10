@@ -1,6 +1,8 @@
 import { ETFComparison } from "@/components/etf-comparison"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import { TickerLogo } from "@/components/ticker-logo"
+import { ETF_DIRECTORY } from "@/lib/etf-directory"
 
 export default function Page() {
   return (
@@ -76,6 +78,37 @@ export default function Page() {
                 복리 효과를 극대화하는 전략과 배당금 재투자 팁을 제공합니다.
               </p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Popular ETF Detail Links */}
+      <div className="py-20 sm:py-28 px-4 bg-white/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
+              인기 ETF 상세 정보
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              실시간 가격·배당수익률·배당월·운용보수를 종목별로 확인하세요.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {ETF_DIRECTORY.slice(0, 12).map((etf) => (
+              <Link
+                key={etf.symbol}
+                href={`/etf/${encodeURIComponent(etf.symbol)}`}
+                className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border hover:border-primary/50 hover:shadow-md transition-all"
+              >
+                <TickerLogo symbol={etf.symbol} label={etf.name} size={40} />
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold text-foreground truncate">{etf.name}</div>
+                  <div className="text-xs text-muted-foreground truncate">{etf.category}</div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              </Link>
+            ))}
           </div>
         </div>
       </div>

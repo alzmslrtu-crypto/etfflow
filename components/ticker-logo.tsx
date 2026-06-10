@@ -8,6 +8,8 @@ type TickerLogoProps = {
   size?: number
   /** 로고를 못 불러왔을 때 표시할 모노그램 배경색 */
   fallbackColor?: string
+  /** 모노그램(대체 표시)에 쓸 이름. 한국 ETF처럼 코드가 숫자일 때 브랜드 약자(TIGER→TI)를 보여주기 위함 */
+  label?: string
   className?: string
 }
 
@@ -16,9 +18,15 @@ function baseSymbol(symbol: string): string {
   return symbol.replace(/\.(KS|KQ|KN)$/i, "")
 }
 
-// 모노그램용 약자 (앞 2글자)
-function monogram(symbol: string): string {
-  return baseSymbol(symbol).slice(0, 2).toUpperCase()
+// 모노그램용 약자: label(이름)이 있으면 첫 단어(브랜드) 앞 2글자, 없으면 심볼 앞 2글자
+function monogram(symbol: string, label?: string): string {
+  const base = baseSymbol(symbol)
+  // 코드가 숫자로만 되어 있고 label이 있으면 브랜드 약자 사용 (예: 458730 + "TIGER ..." -> "TI")
+  if (label && /^\d/.test(base)) {
+    const firstWord = label.trim().split(/\s+/)[0]
+    if (firstWord) return firstWord.slice(0, 2).toUpperCase()
+  }
+  return base.slice(0, 2).toUpperCase()
 }
 
 // parqet 무료 로고 CDN (미국·한국 종목 지원, 인증 불필요)
@@ -26,7 +34,7 @@ function logoUrl(symbol: string): string {
   return `https://assets.parqet.com/logos/symbol/${encodeURIComponent(symbol)}?format=png`
 }
 
-export function TickerLogo({ symbol, size = 40, fallbackColor = "#64748b", className }: TickerLogoProps) {
+export function TickerLogo({ symbol, size = 40, fallbackColor = "#64748b", label, className }: TickerLogoProps) {
   const [errored, setErrored] = useState(false)
 
   // 심볼이 바뀌면 에러 상태 초기화
@@ -45,9 +53,9 @@ export function TickerLogo({ symbol, size = 40, fallbackColor = "#64748b", class
           backgroundColor: fallbackColor,
           fontSize: Math.round(size * 0.36),
         }}
-        aria-label={symbol}
+        aria-label={label || symbol}
       >
-        {monogram(symbol)}
+        {monogram(symbol, label)}
       </div>
     )
   }

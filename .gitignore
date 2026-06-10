@@ -20,3 +20,5 @@ node_modules
 
 # Claude Code / editor agent config (local tooling)
 .claude/
+
+.vercel
