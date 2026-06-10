@@ -74,8 +74,13 @@ function naverSuffix(typeCode: string): string | null {
   }
 }
 
+// 외부 호출 타임아웃 (네이버/야후가 느려도 검색이 멈추지 않도록)
+const FETCH_TIMEOUT_MS = 4000
+
 // 네이버 자동완성 검색 (한국 주식/ETF)
 async function searchNaver(query: string): Promise<StockResult[]> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
   try {
     const res = await fetch(
       `https://ac.stock.naver.com/ac?q=${encodeURIComponent(query)}&target=stock,index,etf`,
@@ -85,6 +90,7 @@ async function searchNaver(query: string): Promise<StockResult[]> {
             "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15",
           Accept: "application/json",
         },
+        signal: controller.signal,
       },
     )
     if (!res.ok) return []
@@ -113,21 +119,28 @@ async function searchNaver(query: string): Promise<StockResult[]> {
     return out
   } catch {
     return []
+  } finally {
+    clearTimeout(timer)
   }
 }
 
 // 야후 검색 (미국/해외 주식·ETF)
 async function searchYahoo(query: string): Promise<StockResult[]> {
   try {
-    const results = await yahooFinance.search(
-      query,
-      { quotesCount: 10, newsCount: 0 },
-      {
-        // Yahoo가 OPTION 등 라이브러리 스키마에 없는 타입을 반환하면
-        // 검증 오류로 전체 검색이 실패하므로 결과 검증을 비활성화한다.
-        validateResult: false,
-      },
-    )
+    const results = await Promise.race([
+      yahooFinance.search(
+        query,
+        { quotesCount: 10, newsCount: 0 },
+        {
+          // Yahoo가 OPTION 등 라이브러리 스키마에 없는 타입을 반환하면
+          // 검증 오류로 전체 검색이 실패하므로 결과 검증을 비활성화한다.
+          validateResult: false,
+        },
+      ),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("yahoo search timeout")), FETCH_TIMEOUT_MS),
+      ),
+    ])
 
     const rawQuotes: SearchQuote[] = Array.isArray((results as { quotes?: unknown })?.quotes)
       ? (results as { quotes: SearchQuote[] }).quotes

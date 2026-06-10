@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { TickerLogo } from "@/components/ticker-logo"
 import { ETF_DIRECTORY } from "@/lib/etf-directory"
+import { FAQ_ITEMS } from "@/lib/faq"
 
 export default function Page() {
   return (
@@ -170,6 +171,39 @@ export default function Page() {
                 자세히 보기 <ArrowRight className="w-4 h-4" />
               </span>
             </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* FAQ Section */}
+      <div className="py-20 sm:py-28 px-4 bg-white/50">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
+              자주 묻는 질문
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              배당 ETF 투자에 대해 가장 많이 궁금해하시는 내용을 정리했습니다.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {FAQ_ITEMS.map((item) => (
+              <details
+                key={item.question}
+                className="group bg-card rounded-xl border border-border p-5 [&_summary::-webkit-details-marker]:hidden"
+              >
+                <summary className="flex items-center justify-between cursor-pointer list-none font-semibold text-foreground">
+                  {item.question}
+                  <span className="ml-4 flex-shrink-0 text-muted-foreground transition-transform group-open:rotate-180">
+                    ▾
+                  </span>
+                </summary>
+                <p className="mt-4 text-muted-foreground leading-relaxed">
+                  {item.answer}
+                </p>
+              </details>
+            ))}
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
+import { FAQ_ITEMS } from '@/lib/faq'
 import './globals.css'
 
 const inter = Inter({ 
@@ -88,48 +89,14 @@ export default function RootLayout({
   const faqLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'SCHD와 JEPI 중 어떤 ETF를 선택해야 하나요?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'SCHD는 배당 성장 중심의 분기 배당 ETF이며, JEPI는 월배당으로 더 높은 배당률을 제공합니다. 장기 자산 성장을 원하면 SCHD, 월간 현금흐름이 중요하면 JEPI를 선택하세요.',
-        },
+    mainEntity: FAQ_ITEMS.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
       },
-      {
-        '@type': 'Question',
-        name: 'ETF 배당수익률은 어떻게 계산하나요?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: '배당수익률은 (연간 배당금 ÷ 현재 가격) × 100 으로 계산됩니다. 본 서비스에서는 실시간 가격과 배당 기록을 바탕으로 자동으로 계산해드립니다.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: '100만원을 배당 ETF에 투자하면 월 수익이 얼마나 되나요?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'ETF와 배당수익률에 따라 다릅니다. 예를 들어 4% 배당수익률이면 월 약 3,300원 수익입니다. 본 서비스의 투자 시뮬레이션으로 정확히 계산할 수 있습니다.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'VOO와 QQQ의 차이점은?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'VOO는 S&P500 지수(전체 미국 대형주), QQQ는 나스닥100(기술주 중심)을 추종합니다. VOO가 더 안정적이고 배당률이 높으며, QQQ는 성장성이 높습니다.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: '배당 ETF 투자 시 세금은 얼마나 들나요?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: '미국 ETF 배당금은 국내에서 15.4% 세금(배당소득세 14% + 지방소득세 10%)이 자동으로 원천징수됩니다.',
-        },
-      },
-    ],
+    })),
   }
 
   return (
