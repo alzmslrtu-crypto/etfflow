@@ -1,0 +1,78 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* Toss-Inspired Clean & Modern Theme */
+:root {
+  --background: #ffffff;
+  --foreground: #0d1117;
+  --card: #f6f8fb;
+  --card-foreground: #0d1117;
+  --popover: #ffffff;
+  --popover-foreground: #0d1117;
+  --primary: #0047ff;
+  --primary-foreground: #ffffff;
+  --secondary: #f0f2f5;
+  --secondary-foreground: #424856;
+  --muted: #dfe1e6;
+  --muted-foreground: #5f6368;
+  --accent: #0047ff;
+  --accent-foreground: #ffffff;
+  --destructive: #ff4458;
+  --destructive-foreground: #ffffff;
+  --border: #e8eaed;
+  --input: #f6f8fb;
+  --ring: #0047ff;
+  --radius: 0.75rem;
+  
+  /* Stock colors */
+  --stock-up: #06a77d;
+  --stock-down: #ff4458;
+  --stock-blue: #0047ff;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'SF Mono', 'Monaco', 'Menlo', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-stock-up: var(--stock-up);
+  --color-stock-down: var(--stock-down);
+  --color-stock-blue: var(--stock-blue);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+/* Tabular number alignment for consistent digit width */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

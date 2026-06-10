@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://www.etfflow.kr/sitemap.xml
+
+User-agent: Googlebot
+Disallow: /api/
+
+User-agent: Bingbot
+Disallow: /api/

@@ -1,0 +1,320 @@
+﻿node : ⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
+At line:1 char:113
++ ... EST_TOKEN=""; node "node_modules\next\dist\bin\next" dev 2>&1 | Out-F ...
++                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (⚠ Port 3000 is ...t 3001 instead.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://26.89.136.55:3001
+✓ Ready in 2.0s
+- Experiments (use with caution):
+  · serverActions
+  ✓ transitionIndicator
+
+Yahoo Finance search error: Error [BadRequestError]: Invalid Search Query
+    at async searchYahoo (app\api\stock\search\route.ts:85:21)
+    at async GET (app\api\stock\search\route.ts:128:40)
+  83 | async function searchYahoo(query: string): Promise<StockResult[]> {
+  84 |   try {
+> 85 |     const results = await yahooFinance.search(
+     |                     ^
+  86 |       query,
+  87 |       { quotesCount: 10, newsCount: 0 },
+  88 |       {
+ GET /api/stock/search?q=%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90 200 in 1941ms (next.js: 1517ms, application-code: 424ms)
+ │ GET https://ac.stock.naver.com/ac?q=%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90&target=stock,index,etf 200 in 69ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v1/finance/search?lang=en-US&region=US&quotesCount=10&newsCount=0&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true&q=%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90 400 in 264ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+Yahoo Finance search error: Error [BadRequestError]: Invalid Search Query
+    at async searchYahoo (app\api\stock\search\route.ts:85:21)
+    at async GET (app\api\stock\search\route.ts:128:40)
+  83 | async function searchYahoo(query: string): Promise<StockResult[]> {
+  84 |   try {
+> 85 |     const results = await yahooFinance.search(
+     |                     ^
+  86 |       query,
+  87 |       { quotesCount: 10, newsCount: 0 },
+  88 |       {
+ GET /api/stock/search?q=%EB%AF%B8%EA%B5%AD%EB%B0%B0%EB%8B%B9 200 in 202ms (next.js: 3ms, application-code: 198ms)
+ │ GET https://ac.stock.naver.com/ac?q=%EB%AF%B8%EA%B5%AD%EB%B0%B0%EB%8B%B9&target=stock,index,etf 200 in 11ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v1/finance/search?lang=en-US&region=US&quotesCount=10&newsCount=0&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true&q=%EB%AF%B8%EA%B5%AD%EB%B0%B0%EB%8B%B9 400 in 126ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock/search?q=SCHD 200 in 184ms (next.js: 3ms, application-code: 181ms)
+ │ GET https://ac.stock.naver.com/ac?q=SCHD&target=stock,index,etf 200 in 13ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v1/finance/search?lang=en-US&region=US&quotesCount=10&newsCount=0&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true&q=SCHD 200 in 166ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+Yahoo Finance search error: Error [BadRequestError]: Invalid Search Query
+    at async searchYahoo (app\api\stock\search\route.ts:122:21)
+    at async GET (app\api\stock\search\route.ts:165:40)
+  120 | async function searchYahoo(query: string): Promise<StockResult[]> {
+  121 |   try {
+> 122 |     const results = await yahooFinance.search(
+      |                     ^
+  123 |       query,
+  124 |       { quotesCount: 10, newsCount: 0 },
+  125 |       {
+ GET /api/stock/search?q=%EB%AF%B8%EA%B5%AD%EB%B0%B0%EB%8B%B9 200 in 615ms (next.js: 168ms, application-code: 447ms)
+ │ GET https://ac.stock.naver.com/ac?q=%EB%AF%B8%EA%B5%AD%EB%B0%B0%EB%8B%B9&target=stock,index,etf 200 in 40ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v1/finance/search?lang=en-US&region=US&quotesCount=10&newsCount=0&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true&q=%EB%AF%B8%EA%B5%AD%EB%B0%B0%EB%8B%B9 400 in 319ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+Yahoo Finance search error: Error [BadRequestError]: Invalid Search Query
+    at async searchYahoo (app\api\stock\search\route.ts:122:21)
+    at async GET (app\api\stock\search\route.ts:165:40)
+  120 | async function searchYahoo(query: string): Promise<StockResult[]> {
+  121 |   try {
+> 122 |     const results = await yahooFinance.search(
+      |                     ^
+  123 |       query,
+  124 |       { quotesCount: 10, newsCount: 0 },
+  125 |       {
+ GET /api/stock/search?q=%EB%B0%B0%EB%8B%B9 200 in 224ms (next.js: 3ms, application-code: 221ms)
+ │ GET https://ac.stock.naver.com/ac?q=%EB%B0%B0%EB%8B%B9&target=stock,index,etf 200 in 11ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v1/finance/search?lang=en-US&region=US&quotesCount=10&newsCount=0&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true&q=%EB%B0%B0%EB%8B%B9 400 in 146ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+Yahoo Finance search error: Error [BadRequestError]: Invalid Search Query
+    at async searchYahoo (app\api\stock\search\route.ts:122:21)
+    at async GET (app\api\stock\search\route.ts:165:40)
+  120 | async function searchYahoo(query: string): Promise<StockResult[]> {
+  121 |   try {
+> 122 |     const results = await yahooFinance.search(
+      |                     ^
+  123 |       query,
+  124 |       { quotesCount: 10, newsCount: 0 },
+  125 |       {
+ GET /api/stock/search?q=%EB%A6%AC%EC%B8%A0 200 in 197ms (next.js: 3ms, application-code: 195ms)
+ │ GET https://ac.stock.naver.com/ac?q=%EB%A6%AC%EC%B8%A0&target=stock,index,etf 200 in 122ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v1/finance/search?lang=en-US&region=US&quotesCount=10&newsCount=0&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true&q=%EB%A6%AC%EC%B8%A0 400 in 143ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock/naver?symbol=458730.KS 200 in 404ms (next.js: 298ms, application-code: 106ms)
+ │ GET https://m.stock.naver.com/api/stock/458730/integration 200 in 30ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://m.stock.naver.com/api/etf/458730/basic 200 in 62ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=458730.KS&period=1Y 200 in 2.6s (next.js: 754ms, application-code: 1813ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/458730.KS?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749284551&period2=1780820551 200 in 244ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://finance.yahoo.com/quote/AAPL 301 in 421ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query1.finance.yahoo.com/v1/test/getcrumb 200 in 402ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=458730.KS&crumb=6adS%2Fgoefba 200 in 113ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET http://localhost:3001/api/stock/naver?symbol=458730.KS 200 in 409ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/458730.KS?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054153&period2=1780820551 200 in 126ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=SCHD&period=1Y 200 in 482ms (next.js: 3ms, application-code: 480ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749284553&period2=1780820553 200 in 132ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SCHD&crumb=6adS%2Fgoefba 200 in 129ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054154&period2=1780820553 200 in 145ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+○ Compiling / ...
+ GET / 200 in 7.2s (next.js: 6.1s, application-code: 1132ms)
+[browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[browser] AdSense head tag doesn't support data-nscript attribute. (https://pagead2.googlesyndication.com/pagead/js/ads
+bygoogle.js?client=ca-pub-2046210707085888:220:300)
+ GET /api/stock?exchangeRate=1 200 in 269ms (next.js: 3ms, application-code: 266ms)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=KRW%3DX&crumb=6adS%2Fgoefba 200 in 258ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=SCHD&period=1Y 200 in 582ms (next.js: 11ms, application-code: 570ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749284707&period2=1780820707 200 in 240ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SCHD&crumb=6adS%2Fgoefba 200 in 118ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054307&period2=1780820707 200 in 143ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=SPY&period=1Y 200 in 916ms (next.js: 3ms, application-code: 913ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SPY?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749284707&period2=1780820707 200 in 392ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SPY&crumb=6adS%2Fgoefba 200 in 119ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SPY?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054307&period2=1780820707 200 in 277ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET / 200 in 13ms (next.js: 5ms, application-code: 9ms)
+ GET / 200 in 25ms (next.js: 3ms, application-code: 21ms)
+ GET / 200 in 9ms (next.js: 4ms, application-code: 5ms)
+Yahoo Finance search error: Error [BadRequestError]: Invalid Search Query
+    at async searchYahoo (app\api\stock\search\route.ts:122:21)
+    at async GET (app\api\stock\search\route.ts:165:40)
+  120 | async function searchYahoo(query: string): Promise<StockResult[]> {
+  121 |   try {
+> 122 |     const results = await yahooFinance.search(
+      |                     ^
+  123 |       query,
+  124 |       { quotesCount: 10, newsCount: 0 },
+  125 |       {
+ GET /api/stock/search?q=%EB%82%98%EC%8A%A4%EB%8B%A5 200 in 341ms (next.js: 3ms, application-code: 338ms)
+ │ GET https://ac.stock.naver.com/ac?q=%EB%82%98%EC%8A%A4%EB%8B%A5&target=stock,index,etf 200 in 34ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v1/finance/search?lang=en-US&region=US&quotesCount=10&newsCount=0&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true&q=%EB%82%98%EC%8A%A4%EB%8B%A5 400 in 258ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock/naver?symbol=133690.KS 200 in 53ms (next.js: 2ms, application-code: 51ms)
+ │ GET https://m.stock.naver.com/api/etf/133690/basic 200 in 35ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://m.stock.naver.com/api/stock/133690/integration 200 in 46ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=133690.KS&period=1Y 200 in 549ms (next.js: 3ms, application-code: 546ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/133690.KS?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749284728&period2=1780820728 200 in 137ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=133690.KS&crumb=6adS%2Fgoefba 200 in 123ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET http://localhost:3001/api/stock/naver?symbol=133690.KS 200 in 57ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/133690.KS?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054328&period2=1780820728 200 in 145ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=SCHD&period=1Y 200 in 650ms (next.js: 8ms, application-code: 642ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749284728&period2=1780820728 200 in 290ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SCHD&crumb=6adS%2Fgoefba 200 in 123ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054328&period2=1780820728 200 in 150ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=SPY&period=1Y 200 in 681ms (next.js: 2ms, application-code: 679ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SPY?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749284728&period2=1780820728 200 in 306ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SPY&crumb=6adS%2Fgoefba 200 in 116ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SPY?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054328&period2=1780820728 200 in 180ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+✓ Compiled in 215ms
+ GET / 200 in 147ms (next.js: 96ms, application-code: 52ms)
+✓ Compiled in 160ms
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /api/stock?symbol=SCHD&period=1Y 200 in 162ms (next.js: 148ms, application-code: 13ms)
+ GET /api/stock?exchangeRate=1 200 in 164ms (next.js: 125ms, application-code: 39ms)
+ GET /api/stock?symbol=SPY&period=1Y 200 in 163ms (next.js: 142ms, application-code: 22ms)
+ GET /api/stock?symbol=133690.KS&period=1Y 200 in 163ms (next.js: 153ms, application-code: 10ms)
+ GET / 200 in 470ms (next.js: 96ms, application-code: 374ms)
+[browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+ GET /api/stock?exchangeRate=1 200 in 522ms (next.js: 2ms, application-code: 520ms)
+ GET /api/stock/naver?symbol=133690.KS 200 in 95ms (next.js: 37ms, application-code: 58ms)
+ │ GET https://m.stock.naver.com/api/etf/133690/basic 200 in 41ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://m.stock.naver.com/api/stock/133690/integration 200 in 50ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock/naver?symbol=133690.KS 200 in 48ms (next.js: 3ms, application-code: 46ms)
+ │ GET https://m.stock.naver.com/api/etf/133690/basic 200 in 38ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://m.stock.naver.com/api/stock/133690/integration 200 in 41ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=133690.KS&period=1Y 200 in 729ms (next.js: 13ms, application-code: 716ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/133690.KS?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749285017&period2=1780821017 200 in 126ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=133690.KS&crumb=e8l7rGDKMAH 200 in 315ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET http://localhost:3001/api/stock/naver?symbol=133690.KS 200 in 99ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054617&period2=1780821015 200 in 250ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=SCHD&period=1Y 200 in 744ms (next.js: 7ms, application-code: 737ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749285017&period2=1780821017 200 in 146ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SCHD&crumb=e8l7rGDKMAH 200 in 221ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SCHD&crumb=e8l7rGDKMAH 200 in 120ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054617&period2=1780821017 200 in 154ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=SPY&period=1Y 200 in 935ms (next.js: 3ms, application-code: 932ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SPY?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749285017&period2=1780821017 200 in 170ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SPY&crumb=e8l7rGDKMAH 200 in 115ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=133690.KS&crumb=e8l7rGDKMAH 200 in 116ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SPY&crumb=e8l7rGDKMAH 200 in 114ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/133690.KS?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054617&period2=1780821017 200 in 134ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SPY?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054617&period2=1780821017 200 in 187ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+✓ Compiled in 85ms
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 272ms (next.js: 111ms, application-code: 161ms)
+[browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+ GET /api/stock?exchangeRate=1 200 in 1075ms (next.js: 118ms, application-code: 957ms)
+ │ GET https://finance.yahoo.com/quote/AAPL 301 in 357ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query1.finance.yahoo.com/v1/test/getcrumb 200 in 443ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=KRW%3DX&crumb=pELBUt8fLbx 200 in 134ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock/naver?symbol=133690.KS 200 in 62ms (next.js: 21ms, application-code: 42ms)
+ │ GET https://m.stock.naver.com/api/stock/133690/integration 200 in 33ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://m.stock.naver.com/api/etf/133690/basic 200 in 33ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=SCHD&period=1Y 200 in 1244ms (next.js: 21ms, application-code: 1223ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749285022&period2=1780821022 200 in 257ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SCHD&crumb=pELBUt8fLbx 200 in 211ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054623&period2=1780821022 200 in 156ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=SPY&period=1Y 200 in 1286ms (next.js: 4ms, application-code: 1282ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SPY?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749285022&period2=1780821022 200 in 312ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SPY&crumb=pELBUt8fLbx 200 in 256ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SPY?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054623&period2=1780821022 200 in 159ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=133690.KS&period=1Y 200 in 1304ms (next.js: 33ms, application-code: 1272ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/133690.KS?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749285022&period2=1780821022 200 in 261ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=133690.KS&crumb=pELBUt8fLbx 200 in 219ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET http://localhost:3001/api/stock/naver?symbol=133690.KS 200 in 66ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/133690.KS?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054623&period2=1780821022 200 in 141ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+✓ Compiled in 84ms
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 291ms (next.js: 126ms, application-code: 165ms)
+[browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+ GET /api/stock?exchangeRate=1 200 in 1045ms (next.js: 113ms, application-code: 932ms)
+ │ GET https://finance.yahoo.com/quote/AAPL 301 in 365ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query1.finance.yahoo.com/v1/test/getcrumb 200 in 440ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=KRW%3DX&crumb=kSJeXrHTJlF 200 in 113ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock/naver?symbol=133690.KS 200 in 74ms (next.js: 20ms, application-code: 54ms)
+ │ GET https://m.stock.naver.com/api/etf/133690/basic 200 in 39ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://m.stock.naver.com/api/stock/133690/integration 200 in 48ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=SPY&period=1Y 200 in 1167ms (next.js: 37ms, application-code: 1130ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SPY?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749285030&period2=1780821030 200 in 284ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SPY&crumb=kSJeXrHTJlF 200 in 116ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SPY?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054631&period2=1780821030 200 in 177ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=SCHD&period=1Y 200 in 1269ms (next.js: 24ms, application-code: 1246ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749285030&period2=1780821030 200 in 261ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=SCHD&crumb=kSJeXrHTJlF 200 in 218ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/SCHD?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054631&period2=1780821030 200 in 178ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ GET /api/stock?symbol=133690.KS&period=1Y 200 in 1288ms (next.js: 7ms, application-code: 1281ms)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/133690.KS?useYfid=true&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&period1=1749285030&period2=1780821030 200 in 270ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v7/finance/quote?symbols=133690.KS&crumb=kSJeXrHTJlF 200 in 246ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET http://localhost:3001/api/stock/naver?symbol=133690.KS 200 in 79ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+ │ GET https://query2.finance.yahoo.com/v8/finance/chart/133690.KS?useYfid=true&interval=1d&includePrePost=true&events=div&lang=en-US&period1=1623054631&period2=1780821030 200 in 133ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+✓ Compiled in 166ms
+ GET / 200 in 280ms (next.js: 91ms, application-code: 189ms)
