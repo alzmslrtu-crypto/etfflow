@@ -27,6 +27,9 @@ export function Header() {
           <Link href="/tools/drip" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             배당 계산기
           </Link>
+          <Link href="/glossary" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            용어사전
+          </Link>
           <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             블로그
           </Link>
@@ -73,6 +76,13 @@ export function Header() {
               onClick={() => setIsMenuOpen(false)}
             >
               배당 계산기
+            </Link>
+            <Link
+              href="/glossary"
+              className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              용어사전
             </Link>
             <Link
               href="/blog"

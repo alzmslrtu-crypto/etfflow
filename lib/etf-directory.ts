@@ -131,6 +131,111 @@ export const ETF_DIRECTORY: EtfInfo[] = [
       "SPYD는 S&P 500 구성 종목 중 배당수익률이 높은 80종목에 동일가중에 가깝게 투자합니다. 배당수익률이 상대적으로 높은 편이며, 부동산·유틸리티 등 경기방어 섹터 비중이 큰 특징이 있습니다.",
   },
 
+  {
+    symbol: "O",
+    name: "O (리얼티 인컴)",
+    longName: "Realty Income Corporation",
+    region: "US",
+    category: "미국 리츠 월배당",
+    issuer: "Realty Income",
+    dividendCycle: "월",
+    tags: ["월배당", "리츠", "부동산", "고배당"],
+    summary: "'월배당의 대명사'로 불리는 미국 대표 리츠로, 매월 배당을 지급하며 수십 년간 배당을 늘려왔습니다.",
+    description:
+      "리얼티 인컴(Realty Income)은 미국 전역의 상업용 부동산을 임대해 안정적인 임대 수익을 올리는 리츠(REIT)입니다. 'The Monthly Dividend Company'라는 별명처럼 매월 배당을 지급하고, 오랜 기간 배당을 꾸준히 늘려와 월배당 투자자에게 매우 인기가 많습니다. 개별 종목이라 ETF보다 분산도는 낮은 점은 유의해야 합니다.",
+  },
+  {
+    symbol: "QQQM",
+    name: "QQQM (인베스코 나스닥 100)",
+    longName: "Invesco NASDAQ 100 ETF",
+    region: "US",
+    category: "나스닥 100",
+    issuer: "Invesco",
+    dividendCycle: "분기",
+    tags: ["나스닥", "기술주", "성장", "저보수"],
+    summary: "QQQ와 같은 나스닥 100을 추종하면서 보수가 더 낮은 장기 투자용 ETF입니다.",
+    description:
+      "QQQM은 QQQ와 동일한 나스닥 100 지수를 추종하지만 운용보수가 더 낮아, 장기 적립식 투자에 유리하게 설계된 ETF입니다. QQQ보다 거래량은 적지만 보수 차이 때문에 장기 보유에는 QQQM을 선택하는 투자자가 많습니다.",
+  },
+  {
+    symbol: "DGRW",
+    name: "DGRW (위즈덤트리 배당성장)",
+    longName: "WisdomTree U.S. Quality Dividend Growth Fund",
+    region: "US",
+    category: "미국 배당성장",
+    issuer: "WisdomTree",
+    dividendCycle: "월",
+    tags: ["미국배당", "배당성장", "월배당", "퀄리티"],
+    summary: "수익성·배당성장성이 좋은 미국 우량주에 투자하며 매월 배당을 지급하는 ETF입니다.",
+    description:
+      "DGRW는 ROE·ROA 등 수익성이 높고 배당 성장이 기대되는 미국 기업에 투자합니다. 미국 ETF 중 드물게 매월 배당을 지급해, 배당성장과 월 현금흐름을 함께 원하는 투자자에게 인기가 있습니다.",
+  },
+  {
+    symbol: "VIG",
+    name: "VIG (뱅가드 배당성장)",
+    longName: "Vanguard Dividend Appreciation ETF",
+    region: "US",
+    category: "미국 배당성장",
+    issuer: "Vanguard",
+    dividendCycle: "분기",
+    tags: ["미국배당", "배당성장", "저보수"],
+    summary: "10년 이상 배당을 늘려온 미국 우량 기업에 폭넓게 투자하는 저보수 배당성장 ETF입니다.",
+    description:
+      "VIG는 10년 이상 연속으로 배당을 늘려온 미국 기업에 분산 투자합니다. 배당수익률 자체는 높지 않지만 배당의 안정성과 성장성, 낮은 보수로 장기 투자자에게 꾸준히 선택받는 ETF입니다.",
+  },
+  {
+    symbol: "SPHD",
+    name: "SPHD (S&P 고배당 저변동성)",
+    longName: "Invesco S&P 500 High Dividend Low Volatility ETF",
+    region: "US",
+    category: "미국 고배당",
+    issuer: "Invesco",
+    dividendCycle: "월",
+    tags: ["미국배당", "고배당", "저변동성", "월배당"],
+    summary: "S&P 500 내 고배당·저변동성 종목에 투자하며 매월 배당을 주는 ETF입니다.",
+    description:
+      "SPHD는 S&P 500 종목 중 배당수익률이 높고 변동성이 낮은 50종목에 투자합니다. 매월 배당을 지급하며, 방어적 성격이 강해 안정적인 인컴을 원하는 투자자에게 적합합니다.",
+  },
+  {
+    symbol: "HDV",
+    name: "HDV (아이셰어즈 고배당)",
+    longName: "iShares Core High Dividend ETF",
+    region: "US",
+    category: "미국 고배당",
+    issuer: "BlackRock (iShares)",
+    dividendCycle: "분기",
+    tags: ["미국배당", "고배당", "우량주"],
+    summary: "재무가 튼튼한 미국 고배당 우량주에 집중 투자하는 ETF입니다.",
+    description:
+      "HDV는 재무 건전성이 우수하면서 배당수익률이 높은 미국 기업 약 75종목에 투자합니다. 에너지·헬스케어·필수소비재 등 경기방어 섹터 비중이 큰 편으로, 안정적 배당을 추구합니다.",
+  },
+  {
+    symbol: "DIVO",
+    name: "DIVO (앰플리파이 인핸스드 배당)",
+    longName: "Amplify CWP Enhanced Dividend Income ETF",
+    region: "US",
+    category: "커버드콜 월배당",
+    issuer: "Amplify",
+    dividendCycle: "월",
+    tags: ["월배당", "커버드콜", "배당성장", "인컴"],
+    summary: "우량 배당주에 부분적으로 커버드콜을 더해 월배당을 지급하는 인컴형 ETF입니다.",
+    description:
+      "DIVO는 우량 배당주 포트폴리오에 선별적으로 커버드콜 전략을 적용해 분배금을 높인 ETF입니다. JEPI보다 옵션 비중이 낮아 상승 여력을 일부 남기면서 월 현금흐름을 추구합니다.",
+  },
+  {
+    symbol: "NOBL",
+    name: "NOBL (S&P 배당귀족)",
+    longName: "ProShares S&P 500 Dividend Aristocrats ETF",
+    region: "US",
+    category: "미국 배당성장",
+    issuer: "ProShares",
+    dividendCycle: "분기",
+    tags: ["미국배당", "배당귀족", "배당성장"],
+    summary: "25년 이상 배당을 늘려온 'S&P 500 배당귀족' 기업에 투자하는 ETF입니다.",
+    description:
+      "NOBL은 25년 이상 매년 배당을 늘려온 S&P 500 배당귀족 기업에 동일가중에 가깝게 투자합니다. 배당의 지속성과 안정성을 중시하는 보수적 배당 투자자에게 적합합니다.",
+  },
+
   // ===== 한국 상장 =====
   {
     symbol: "458730.KS",
@@ -280,6 +385,15 @@ export const COMPARE_PAIRS: [string, string][] = [
   ["458730.KS", "446720.KS"],
   ["458730.KS", "402970.KS"],
   ["360750.KS", "133690.KS"],
+  ["QQQ", "QQQM"],
+  ["SCHD", "O"],
+  ["O", "JEPI"],
+  ["SCHD", "DGRW"],
+  ["VIG", "DGRO"],
+  ["NOBL", "SCHD"],
+  ["SPHD", "JEPI"],
+  ["VYM", "HDV"],
+  ["DIVO", "JEPI"],
 ]
 
 // 비교 쌍 slug (예: "schd-vs-jepi")

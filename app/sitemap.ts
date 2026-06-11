@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import { blogPosts } from '@/lib/blog-posts'
 import { ETF_DIRECTORY, COMPARE_PAIRS, pairSlug } from '@/lib/etf-directory'
+import { GLOSSARY } from '@/lib/glossary'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.etfflow.kr'
@@ -61,6 +62,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: 0.7,
     },
+    {
+      url: `${baseUrl}/tools/tax`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/glossary`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    },
   ]
 
   // Dynamic blog posts - automatically includes all posts from blogPosts
@@ -87,5 +100,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }))
 
-  return [...staticPages, ...blogPages, ...etfPages, ...comparePages]
+  // 용어 사전 개별 페이지
+  const glossaryPages = GLOSSARY.map((t) => ({
+    url: `${baseUrl}/glossary/${t.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }))
+
+  return [...staticPages, ...blogPages, ...etfPages, ...comparePages, ...glossaryPages]
 }
