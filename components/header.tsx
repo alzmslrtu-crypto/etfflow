@@ -24,7 +24,7 @@ export function Header() {
           <Link href="/etf" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             ETF 모음
           </Link>
-          <Link href="/tools/drip" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="/tools" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             배당 계산기
           </Link>
           <Link href="/glossary" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -71,7 +71,7 @@ export function Header() {
               ETF 모음
             </Link>
             <Link
-              href="/tools/drip"
+              href="/tools"
               className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
