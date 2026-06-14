@@ -31,6 +31,8 @@ export async function generateMetadata({
     description,
     alternates: { canonical: url },
     openGraph: { title, description, url, type: "website" },
+    // 자동 생성 비교 페이지는 색인에서 제외(scaled content 감점 방지), 링크는 따라가도록 follow
+    robots: { index: false, follow: true },
   }
 }
 

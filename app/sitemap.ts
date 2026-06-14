@@ -1,7 +1,6 @@
 import { MetadataRoute } from 'next'
 import { blogPosts } from '@/lib/blog-posts'
-import { ETF_DIRECTORY, COMPARE_PAIRS, pairSlug } from '@/lib/etf-directory'
-import { GLOSSARY } from '@/lib/glossary'
+import { ETF_DIRECTORY } from '@/lib/etf-directory'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.etfflow.kr'
@@ -92,21 +91,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }))
 
-  // ETF 1:1 비교 페이지
-  const comparePages = COMPARE_PAIRS.map(([a, b]) => ({
-    url: `${baseUrl}/compare/${pairSlug(a, b)}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.6,
-  }))
-
-  // 용어 사전 개별 페이지
-  const glossaryPages = GLOSSARY.map((t) => ({
-    url: `${baseUrl}/glossary/${t.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly' as const,
-    priority: 0.5,
-  }))
-
-  return [...staticPages, ...blogPages, ...etfPages, ...comparePages, ...glossaryPages]
+  // 비교 페이지·용어 개별 페이지는 자동 생성(양산형)이라 색인 제외(noindex)하므로
+  // 사이트맵에서도 제외한다. 허브 페이지(/etf, /glossary)와 블로그·도구만 색인.
+  return [...staticPages, ...blogPages, ...etfPages]
 }

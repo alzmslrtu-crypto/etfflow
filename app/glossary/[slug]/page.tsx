@@ -25,6 +25,8 @@ export async function generateMetadata({
     description,
     alternates: { canonical: `${BASE_URL}/glossary/${term.slug}` },
     openGraph: { title, description, url: `${BASE_URL}/glossary/${term.slug}`, type: "article" },
+    // 짧은 용어 페이지는 색인 제외(scaled content 감점 방지), 용어 사전 허브(/glossary)만 색인
+    robots: { index: false, follow: true },
   }
 }
 
