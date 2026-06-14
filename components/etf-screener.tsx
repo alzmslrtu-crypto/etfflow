@@ -4,57 +4,40 @@ import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { Search, Loader2, TrendingUp, TrendingDown, ArrowRight } from "lucide-react"
 import { TickerLogo } from "@/components/ticker-logo"
-import { ETF_DIRECTORY } from "@/lib/etf-directory"
 
-type EtfListItem = {
+type EtfItem = {
   symbol: string
   code: string
   name: string
   price: number
   changeRate: number
-  return3m: number
-  nav: number
-  marketSum: number
+  return3m: number // 국내
+  return1y: number // 미국
+  marketSum: number // 국내(억원)
   category: string
-  tab: number
-  listing?: "KR" | "US"
+  listing: "KR" | "US"
 }
 
-type Sort = "marketSum" | "return3m" | "changeRate" | "name"
+type Sort = "marketSum" | "return" | "changeRate" | "name"
 
 const CATEGORIES = ["전체", "미국 상장", "국내 시장지수", "국내 업종·테마", "국내 파생", "해외 주식", "원자재", "채권", "기타·혼합"]
-
-// 큐레이션된 대표 미국 상장 ETF (네이버 국내 목록엔 없으므로 별도로 합친다)
-const US_ITEMS: EtfListItem[] = ETF_DIRECTORY.filter((e) => e.region === "US").map((e) => ({
-  symbol: e.symbol,
-  code: e.symbol,
-  name: e.name,
-  price: 0,
-  changeRate: 0,
-  return3m: 0,
-  nav: 0,
-  marketSum: 0,
-  category: "미국 상장",
-  tab: 0,
-  listing: "US",
-}))
 const SORTS: { key: Sort; label: string }[] = [
   { key: "marketSum", label: "시가총액순" },
-  { key: "return3m", label: "3개월 수익률순" },
+  { key: "return", label: "수익률순" },
   { key: "changeRate", label: "등락률순" },
   { key: "name", label: "이름순" },
 ]
 const PER_PAGE = 30
 
-// marketSum 단위는 억원 (예: 39010 = 3.9조). 조/억원으로 포맷
-function aum(marketSumEok: number): string {
-  if (marketSumEok >= 10000) return `${(marketSumEok / 10000).toFixed(1)}조원`
-  if (marketSumEok >= 1) return `${Math.round(marketSumEok).toLocaleString()}억원`
+function aum(eok: number): string {
+  if (eok >= 10000) return `${(eok / 10000).toFixed(1)}조원`
+  if (eok >= 1) return `${Math.round(eok).toLocaleString()}억원`
   return "-"
 }
 
 export function EtfScreener() {
-  const [items, setItems] = useState<EtfListItem[]>([])
+  const [krItems, setKrItems] = useState<EtfItem[]>([])
+  const [usItems, setUsItems] = useState<EtfItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [query, setQuery] = useState("")
@@ -64,46 +47,74 @@ export function EtfScreener() {
 
   useEffect(() => {
     let active = true
-    fetch("/api/etf/list")
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d) => {
-        if (active) setItems(d.items || [])
+    Promise.all([
+      fetch("/api/etf/list").then((r) => (r.ok ? r.json() : { items: [] })).catch(() => ({ items: [] })),
+      fetch("/api/etf/us-list").then((r) => (r.ok ? r.json() : { items: [] })).catch(() => ({ items: [] })),
+    ])
+      .then(([kr, us]) => {
+        if (!active) return
+        const krMapped: EtfItem[] = (kr.items || []).map((e: any) => ({
+          symbol: e.symbol,
+          code: e.code,
+          name: e.name,
+          price: e.price,
+          changeRate: e.changeRate,
+          return3m: e.return3m,
+          return1y: 0,
+          marketSum: e.marketSum,
+          category: e.category,
+          listing: "KR" as const,
+        }))
+        const usMapped: EtfItem[] = (us.items || []).map((e: any) => ({
+          symbol: e.symbol,
+          code: e.symbol,
+          name: e.name,
+          price: 0,
+          changeRate: 0,
+          return3m: 0,
+          return1y: 0,
+          marketSum: 0,
+          category: "미국 상장",
+          listing: "US" as const,
+        }))
+        setKrItems(krMapped)
+        setUsItems(usMapped)
+        if (krMapped.length === 0 && usMapped.length === 0) setError(true)
       })
-      .catch(() => active && setError(true))
       .finally(() => active && setLoading(false))
     return () => {
       active = false
     }
   }, [])
 
-  // 필터 바뀌면 1페이지로
   useEffect(() => setPage(1), [query, category, sort])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    const match = (e: EtfListItem) => !q || `${e.code} ${e.name}`.toLowerCase().includes(q)
+    const match = (e: EtfItem) => !q || `${e.code} ${e.name}`.toLowerCase().includes(q)
 
-    // 카테고리별 소스 구성 (미국 상장은 큐레이션 목록에서)
-    let base: EtfListItem[]
+    let base: EtfItem[]
     if (category === "미국 상장") {
-      base = US_ITEMS
+      base = usItems
     } else if (category === "전체") {
-      // 전체: 국내 목록 + (검색 시) 미국 상장 매칭 종목도 함께
-      base = q ? [...US_ITEMS, ...items] : items
+      base = q ? [...krItems, ...usItems] : krItems
     } else {
-      base = items.filter((e) => e.category === category)
+      base = krItems.filter((e) => e.category === category)
     }
 
-    let list = base.filter(match)
-    list = [...list].sort((a, b) => {
-      // 미국 상장(데이터 없음)은 검색이 아닌 한 뒤로
+    const list = base.filter(match)
+    list.sort((a, b) => {
       if (sort === "name") return a.name.localeCompare(b.name)
-      if (sort === "return3m") return b.return3m - a.return3m
       if (sort === "changeRate") return b.changeRate - a.changeRate
+      if (sort === "return") {
+        const ra = a.listing === "US" ? a.return1y : a.return3m
+        const rb = b.listing === "US" ? b.return1y : b.return3m
+        return rb - ra
+      }
       return b.marketSum - a.marketSum
     })
     return list
-  }, [items, query, category, sort])
+  }, [krItems, usItems, query, category, sort])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   const pageItems = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
@@ -125,19 +136,17 @@ export function EtfScreener() {
 
   return (
     <div className="space-y-5">
-      {/* 검색 */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="ETF 검색 (예: KODEX 200, 반도체, 미국배당)"
+          placeholder="ETF 검색 (예: KODEX 200, 반도체, SCHD, 미국배당)"
           className="w-full h-11 pl-10 pr-4 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
       </div>
 
-      {/* 필터 */}
       <div className="space-y-3 rounded-2xl border border-border bg-card p-4">
         <div className="flex items-start gap-3">
           <span className="text-xs font-semibold text-muted-foreground w-12 flex-shrink-0 pt-1.5">분류</span>
@@ -157,20 +166,19 @@ export function EtfScreener() {
         </div>
       </div>
 
-      {/* 결과 수 */}
       <div className="text-sm text-muted-foreground">
         총 <span className="font-semibold text-foreground">{filtered.length.toLocaleString()}</span>개 ETF
         {totalPages > 1 && <span className="ml-1">· {page}/{totalPages} 페이지</span>}
       </div>
 
-      {/* 목록 */}
       <div className="space-y-2">
         {pageItems.map((e) => {
           const up = e.changeRate >= 0
           const isUS = e.listing === "US"
+          const ret = isUS ? e.return1y : e.return3m
           return (
             <Link
-              key={e.symbol}
+              key={`${e.listing}-${e.symbol}`}
               href={`/etf/${encodeURIComponent(e.symbol)}`}
               className="flex items-center gap-3 p-3 sm:p-4 bg-card rounded-xl border border-border hover:border-primary/50 hover:shadow-md transition-all"
             >
@@ -178,14 +186,13 @@ export function EtfScreener() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <span className="font-semibold text-foreground truncate">{e.name}</span>
-                  {isUS && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground flex-shrink-0">🇺🇸 미국</span>
-                  )}
+                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded flex-shrink-0 ${isUS ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary"}`}>
+                    {isUS ? "🇺🇸" : "🇰🇷"}
+                  </span>
                 </div>
-                <div className="text-xs text-muted-foreground">{e.code} · {e.category}</div>
+                <div className="text-xs text-muted-foreground truncate">{e.code} · {e.category}</div>
               </div>
               {isUS ? (
-                // 미국 상장: 실시간 시세는 상세에서
                 <div className="flex items-center gap-1 text-xs text-primary font-medium flex-shrink-0">
                   상세 보기 <ArrowRight className="h-3.5 w-3.5" />
                 </div>
@@ -200,10 +207,10 @@ export function EtfScreener() {
                       {up ? "+" : ""}{e.changeRate.toFixed(2)}%
                     </div>
                   </div>
-                  <div className="text-right flex-shrink-0 hidden sm:block w-24">
+                  <div className="text-right flex-shrink-0 hidden sm:block w-20">
                     <div className="text-[11px] text-muted-foreground">3개월</div>
-                    <div className={`text-sm font-medium tabular-nums ${e.return3m >= 0 ? "text-stock-up" : "text-stock-down"}`}>
-                      {e.return3m >= 0 ? "+" : ""}{e.return3m.toFixed(1)}%
+                    <div className={`text-sm font-medium tabular-nums ${ret >= 0 ? "text-stock-up" : "text-stock-down"}`}>
+                      {ret >= 0 ? "+" : ""}{ret.toFixed(1)}%
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0 hidden md:block w-24">
@@ -220,7 +227,6 @@ export function EtfScreener() {
         )}
       </div>
 
-      {/* 페이지네이션 */}
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 pt-2">
           <button
