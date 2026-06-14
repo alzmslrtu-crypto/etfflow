@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { Search, Loader2, TrendingUp, TrendingDown } from "lucide-react"
+import { Search, Loader2, TrendingUp, TrendingDown, ArrowRight } from "lucide-react"
 import { TickerLogo } from "@/components/ticker-logo"
+import { ETF_DIRECTORY } from "@/lib/etf-directory"
 
 type EtfListItem = {
   symbol: string
@@ -16,11 +17,27 @@ type EtfListItem = {
   marketSum: number
   category: string
   tab: number
+  listing?: "KR" | "US"
 }
 
 type Sort = "marketSum" | "return3m" | "changeRate" | "name"
 
-const CATEGORIES = ["전체", "국내 시장지수", "국내 업종·테마", "국내 파생", "해외 주식", "원자재", "채권", "기타·혼합"]
+const CATEGORIES = ["전체", "미국 상장", "국내 시장지수", "국내 업종·테마", "국내 파생", "해외 주식", "원자재", "채권", "기타·혼합"]
+
+// 큐레이션된 대표 미국 상장 ETF (네이버 국내 목록엔 없으므로 별도로 합친다)
+const US_ITEMS: EtfListItem[] = ETF_DIRECTORY.filter((e) => e.region === "US").map((e) => ({
+  symbol: e.symbol,
+  code: e.symbol,
+  name: e.name,
+  price: 0,
+  changeRate: 0,
+  return3m: 0,
+  nav: 0,
+  marketSum: 0,
+  category: "미국 상장",
+  tab: 0,
+  listing: "US",
+}))
 const SORTS: { key: Sort; label: string }[] = [
   { key: "marketSum", label: "시가총액순" },
   { key: "return3m", label: "3개월 수익률순" },
@@ -64,12 +81,22 @@ export function EtfScreener() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    let list = items.filter((e) => {
-      if (category !== "전체" && e.category !== category) return false
-      if (q && !(`${e.code} ${e.name}`.toLowerCase().includes(q))) return false
-      return true
-    })
+    const match = (e: EtfListItem) => !q || `${e.code} ${e.name}`.toLowerCase().includes(q)
+
+    // 카테고리별 소스 구성 (미국 상장은 큐레이션 목록에서)
+    let base: EtfListItem[]
+    if (category === "미국 상장") {
+      base = US_ITEMS
+    } else if (category === "전체") {
+      // 전체: 국내 목록 + (검색 시) 미국 상장 매칭 종목도 함께
+      base = q ? [...US_ITEMS, ...items] : items
+    } else {
+      base = items.filter((e) => e.category === category)
+    }
+
+    let list = base.filter(match)
     list = [...list].sort((a, b) => {
+      // 미국 상장(데이터 없음)은 검색이 아닌 한 뒤로
       if (sort === "name") return a.name.localeCompare(b.name)
       if (sort === "return3m") return b.return3m - a.return3m
       if (sort === "changeRate") return b.changeRate - a.changeRate
@@ -140,6 +167,7 @@ export function EtfScreener() {
       <div className="space-y-2">
         {pageItems.map((e) => {
           const up = e.changeRate >= 0
+          const isUS = e.listing === "US"
           return (
             <Link
               key={e.symbol}
@@ -148,28 +176,42 @@ export function EtfScreener() {
             >
               <TickerLogo symbol={e.symbol} label={e.name} size={36} />
               <div className="min-w-0 flex-1">
-                <div className="font-semibold text-foreground truncate">{e.name}</div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-semibold text-foreground truncate">{e.name}</span>
+                  {isUS && (
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground flex-shrink-0">🇺🇸 미국</span>
+                  )}
+                </div>
                 <div className="text-xs text-muted-foreground">{e.code} · {e.category}</div>
               </div>
-              <div className="text-right flex-shrink-0">
-                <div className="font-semibold text-foreground tabular-nums text-sm">
-                  ₩{e.price.toLocaleString()}
+              {isUS ? (
+                // 미국 상장: 실시간 시세는 상세에서
+                <div className="flex items-center gap-1 text-xs text-primary font-medium flex-shrink-0">
+                  상세 보기 <ArrowRight className="h-3.5 w-3.5" />
                 </div>
-                <div className={`text-xs font-medium tabular-nums flex items-center justify-end gap-0.5 ${up ? "text-stock-up" : "text-stock-down"}`}>
-                  {up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                  {up ? "+" : ""}{e.changeRate.toFixed(2)}%
-                </div>
-              </div>
-              <div className="text-right flex-shrink-0 hidden sm:block w-24">
-                <div className="text-[11px] text-muted-foreground">3개월</div>
-                <div className={`text-sm font-medium tabular-nums ${e.return3m >= 0 ? "text-stock-up" : "text-stock-down"}`}>
-                  {e.return3m >= 0 ? "+" : ""}{e.return3m.toFixed(1)}%
-                </div>
-              </div>
-              <div className="text-right flex-shrink-0 hidden md:block w-24">
-                <div className="text-[11px] text-muted-foreground">시가총액</div>
-                <div className="text-sm font-medium text-foreground tabular-nums">{aum(e.marketSum)}</div>
-              </div>
+              ) : (
+                <>
+                  <div className="text-right flex-shrink-0">
+                    <div className="font-semibold text-foreground tabular-nums text-sm">
+                      ₩{e.price.toLocaleString()}
+                    </div>
+                    <div className={`text-xs font-medium tabular-nums flex items-center justify-end gap-0.5 ${up ? "text-stock-up" : "text-stock-down"}`}>
+                      {up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                      {up ? "+" : ""}{e.changeRate.toFixed(2)}%
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0 hidden sm:block w-24">
+                    <div className="text-[11px] text-muted-foreground">3개월</div>
+                    <div className={`text-sm font-medium tabular-nums ${e.return3m >= 0 ? "text-stock-up" : "text-stock-down"}`}>
+                      {e.return3m >= 0 ? "+" : ""}{e.return3m.toFixed(1)}%
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0 hidden md:block w-24">
+                    <div className="text-[11px] text-muted-foreground">시가총액</div>
+                    <div className="text-sm font-medium text-foreground tabular-nums">{aum(e.marketSum)}</div>
+                  </div>
+                </>
+              )}
             </Link>
           )
         })}
