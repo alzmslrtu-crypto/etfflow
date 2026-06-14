@@ -23,9 +23,10 @@ export default function ScreenerPage() {
           <span className="text-foreground font-medium">ETF 파인더</span>
         </nav>
 
-        <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">ETF 파인더</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">국내 ETF 파인더</h1>
         <p className="text-base text-muted-foreground mb-8">
-          국내 상장 전체 ETF를 분류·정렬·검색으로 빠르게 찾아보세요. 종목을 누르면 실시간 가격·배당 정보를 확인할 수 있습니다.
+          국내 상장 전체 ETF(약 1,100개)를 업종·분류·수익률로 검색·정렬해 찾아보세요. 종목을 누르면 실시간 가격·배당 정보를 확인할 수 있습니다.
+          미국 상장 ETF는 상단 <Link href="/#compare" className="text-primary hover:underline">검색</Link>에서 찾을 수 있습니다.
         </p>
 
         <EtfScreener />
