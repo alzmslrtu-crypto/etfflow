@@ -39,25 +39,35 @@ export type EtfListItem = {
   tab: number
 }
 
+async function fetchNaverList(): Promise<NaverEtfItem[]> {
+  const res = await fetch(NAVER_ETF_LIST, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      Referer: "https://finance.naver.com/",
+      Accept: "application/json",
+    },
+    next: { revalidate: 600 },
+  })
+  if (!res.ok) throw new Error("naver fetch failed")
+  // 네이버 레거시 API는 EUC-KR 인코딩이라 UTF-8로 읽으면 한글이 깨진다.
+  const buffer = await res.arrayBuffer()
+  const text = new TextDecoder("euc-kr").decode(buffer)
+  const data = JSON.parse(text)
+  return data?.result?.etfItemList ?? []
+}
+
 export async function GET() {
   try {
-    const res = await fetch(NAVER_ETF_LIST, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-        Referer: "https://finance.naver.com/",
-        Accept: "application/json",
-      },
-      // 프레임워크 레벨 캐시 10분
-      next: { revalidate: 600 },
-    })
-    if (!res.ok) {
-      return NextResponse.json({ items: [], error: "naver fetch failed" }, { status: 200 })
+    // 콜드스타트/일시적 지연 대비 1회 재시도
+    let raw: NaverEtfItem[] = []
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        raw = await fetchNaverList()
+        if (raw.length > 0) break
+      } catch {
+        if (attempt === 1) throw new Error("retry failed")
+      }
     }
-    // 네이버 레거시 API는 EUC-KR 인코딩이라 UTF-8로 읽으면 한글이 깨진다.
-    const buffer = await res.arrayBuffer()
-    const text = new TextDecoder("euc-kr").decode(buffer)
-    const data = JSON.parse(text)
-    const raw: NaverEtfItem[] = data?.result?.etfItemList ?? []
 
     const items: EtfListItem[] = raw.map((it) => ({
       symbol: `${it.itemcode}.KS`,
