@@ -27,6 +27,8 @@ export async function generateMetadata({
     description,
     alternates: { canonical: url },
     openGraph: { title, description, url, type: "website" },
+    // 자동 생성 종목 상세는 색인 제외(scaled content 감점 방지). 허브(/etf)·블로그 중심으로 색인
+    robots: { index: false, follow: true },
   }
 }
 
