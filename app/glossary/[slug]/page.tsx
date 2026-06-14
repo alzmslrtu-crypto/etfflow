@@ -87,7 +87,7 @@ export default async function GlossaryTermPage({
                 <Link
                   key={t.slug}
                   href={`/glossary/${t.slug}`}
-                  className="block p-4 bg-card rounded-xl border border-border hover:border-primary/50 transition-all"
+                  className="block p-4 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                 >
                   <div className="font-semibold text-foreground mb-0.5">{t.term}</div>
                   <div className="text-xs text-muted-foreground line-clamp-1">{t.short}</div>

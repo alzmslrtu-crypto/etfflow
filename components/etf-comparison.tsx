@@ -805,7 +805,7 @@ export function ETFComparison() {
               ) : chartType === "returns" ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                    <CartesianGrid strokeDasharray="4 4" stroke="var(--border)" strokeOpacity={0.5} vertical={false} />
                     <XAxis
                       dataKey="date"
                       tickFormatter={(value) => {
@@ -814,8 +814,9 @@ export function ETFComparison() {
                       }}
                       tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                       tickLine={false}
-                      axisLine={{ stroke: "var(--border)" }}
+                      axisLine={false}
                       interval="preserveStartEnd"
+                      minTickGap={40}
                     />
                     <YAxis
                       tickFormatter={(value) => `${value}%`}
@@ -829,11 +830,12 @@ export function ETFComparison() {
                     {symbols.map((symbol, index) => (
                       <Line
                         key={symbol}
-                        type="monotone"
+                        type="natural"
                         dataKey={symbol}
                         stroke={COLORS[index]}
-                        strokeWidth={2}
+                        strokeWidth={2.5}
                         dot={false}
+                        activeDot={{ r: 4, strokeWidth: 0 }}
                         name={symbol}
                         connectNulls
                       />
@@ -846,12 +848,12 @@ export function ETFComparison() {
                     data={dividendChartType === "yearly" ? dividendChartData : monthlyDividendChartData} 
                     margin={{ top: 30, right: 10, left: 0, bottom: 10 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                    <CartesianGrid strokeDasharray="4 4" stroke="var(--border)" strokeOpacity={0.5} vertical={false} />
                     <XAxis
                       dataKey={dividendChartType === "yearly" ? "year" : "month"}
                       tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                       tickLine={false}
-                      axisLine={{ stroke: "var(--border)" }}
+                      axisLine={false}
                     />
                     <YAxis
                       tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
@@ -864,10 +866,10 @@ export function ETFComparison() {
                     {symbols.map((symbol, index) => (
                       <Line
                         key={symbol}
-                        type="monotone"
+                        type="natural"
                         dataKey={symbol}
                         stroke={COLORS[index]}
-                        strokeWidth={2}
+                        strokeWidth={2.5}
                         dot={(props: any) => {
                           const { cx, cy, payload } = props
                           const value = payload[symbol]

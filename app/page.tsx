@@ -1,6 +1,6 @@
 import { ETFComparison } from "@/components/etf-comparison"
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, BarChart3, Wallet, TrendingUp } from "lucide-react"
 import { TickerLogo } from "@/components/ticker-logo"
 import { ETF_DIRECTORY } from "@/lib/etf-directory"
 import { FAQ_ITEMS } from "@/lib/faq"
@@ -49,30 +49,30 @@ export default function Page() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-8 bg-card rounded-2xl border border-border hover:border-primary/50 hover:shadow-lg transition-all">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
               <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                <span className="text-2xl">📊</span>
+                <BarChart3 className="w-7 h-7 text-primary" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-3">실시간 비교 분석</h3>
               <p className="text-muted-foreground leading-relaxed">
                 여러 배당 ETF의 수익률, 배당율, 주가를 한눈에 비교하고 트렌드를 파악하세요.
               </p>
             </div>
-            
-            <div className="p-8 bg-card rounded-2xl border border-border hover:border-primary/50 hover:shadow-lg transition-all">
+
+            <div className="p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
               <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                <span className="text-2xl">💰</span>
+                <Wallet className="w-7 h-7 text-primary" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-3">배당금 계산기</h3>
               <p className="text-muted-foreground leading-relaxed">
                 투자금액을 입력하면 예상 배당금과 월별 수익을 자동으로 계산해 드립니다.
               </p>
             </div>
-            
-            <div className="p-8 bg-card rounded-2xl border border-border hover:border-primary/50 hover:shadow-lg transition-all">
+
+            <div className="p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
               <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                <span className="text-2xl">📈</span>
+                <TrendingUp className="w-7 h-7 text-primary" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-3">스마트 인사이트</h3>
               <p className="text-muted-foreground leading-relaxed">
@@ -100,7 +100,7 @@ export default function Page() {
               <Link
                 key={etf.symbol}
                 href={`/etf/${encodeURIComponent(etf.symbol)}`}
-                className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border hover:border-primary/50 hover:shadow-md transition-all"
+                className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               >
                 <TickerLogo symbol={etf.symbol} label={etf.name} size={40} />
                 <div className="min-w-0 flex-1">
@@ -127,7 +127,7 @@ export default function Page() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Link href="/blog/etf-beginners-guide" className="group p-8 bg-card rounded-2xl border border-border hover:border-primary hover:shadow-xl transition-all">
+            <Link href="/blog/etf-beginners-guide" className="group p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
               <div className="inline-block px-3 py-1 bg-primary/10 rounded-full mb-4">
                 <span className="text-xs font-semibold text-primary">입문</span>
               </div>
@@ -142,7 +142,7 @@ export default function Page() {
               </span>
             </Link>
             
-            <Link href="/blog/schd-vs-jepi" className="group p-8 bg-card rounded-2xl border border-border hover:border-primary hover:shadow-xl transition-all">
+            <Link href="/blog/schd-vs-jepi" className="group p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
               <div className="inline-block px-3 py-1 bg-primary/10 rounded-full mb-4">
                 <span className="text-xs font-semibold text-primary">비교</span>
               </div>
@@ -157,7 +157,7 @@ export default function Page() {
               </span>
             </Link>
             
-            <Link href="/blog/dividend-reinvestment" className="group p-8 bg-card rounded-2xl border border-border hover:border-primary hover:shadow-xl transition-all">
+            <Link href="/blog/dividend-reinvestment" className="group p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
               <div className="inline-block px-3 py-1 bg-primary/10 rounded-full mb-4">
                 <span className="text-xs font-semibold text-primary">전략</span>
               </div>
@@ -191,7 +191,7 @@ export default function Page() {
             {FAQ_ITEMS.map((item) => (
               <details
                 key={item.question}
-                className="group bg-card rounded-xl border border-border p-5 [&_summary::-webkit-details-marker]:hidden"
+                className="group bg-card rounded-2xl shadow-sm p-5 [&_summary::-webkit-details-marker]:hidden"
               >
                 <summary className="flex items-center justify-between cursor-pointer list-none font-semibold text-foreground">
                   {item.question}

@@ -50,7 +50,7 @@ function EtfCard({ etf }: { etf: EtfInfo }) {
   return (
     <Link
       href={`/etf/${encodeURIComponent(etf.symbol)}`}
-      className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border hover:border-primary/50 hover:shadow-md transition-all"
+      className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
     >
       <TickerLogo symbol={etf.symbol} label={etf.name} size={40} />
       <div className="min-w-0 flex-1">
@@ -75,9 +75,16 @@ export default function EtfIndexPage() {
         </nav>
 
         <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">배당 ETF 모음</h1>
-        <p className="text-base text-muted-foreground mb-10 max-w-2xl">
+        <p className="text-base text-muted-foreground mb-5 max-w-2xl">
           유형별로 정리한 인기 배당 ETF입니다. 종목을 누르면 실시간 가격·배당수익률·배당월·운용보수를 확인하고, 비교 도구에 바로 담을 수 있습니다.
         </p>
+        <Link
+          href="/etf/screener"
+          className="inline-flex items-center gap-2 px-5 py-2.5 mb-10 bg-card border border-border rounded-full font-semibold text-sm text-foreground hover:border-primary/50 transition-all"
+        >
+          🔍 ETF 파인더 — 조건별로 찾기
+          <ArrowRight className="w-4 h-4 text-primary" />
+        </Link>
 
         <div className="space-y-12">
           {GROUPS.map((group) => {

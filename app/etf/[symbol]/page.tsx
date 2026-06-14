@@ -111,7 +111,7 @@ export default async function EtfDetailPage({
                 <Link
                   key={e.symbol}
                   href={`/etf/${encodeURIComponent(e.symbol)}`}
-                  className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-md transition-all"
+                  className="flex items-center gap-3 p-4 rounded-2xl shadow-sm bg-card hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                 >
                   <TickerLogo symbol={e.symbol} label={e.name} size={36} />
                   <div className="min-w-0">

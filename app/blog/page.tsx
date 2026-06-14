@@ -64,7 +64,7 @@ export default function Blog() {
                     <Link
                       key={post.id}
                       href={`/blog/${post.slug}`}
-                      className="group block p-5 bg-card rounded-xl border border-border hover:border-primary/50 hover:shadow-md transition-all"
+                      className="group block p-5 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                     >
                       <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors mb-1.5">
                         {post.title}
