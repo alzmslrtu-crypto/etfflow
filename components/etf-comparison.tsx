@@ -1169,7 +1169,7 @@ export function ETFComparison() {
               })()}
 
               {/* Stock Investment Cards - Toss Style */}
-              <div className="space-y-4">
+              <div className="space-y-2.5">
                 {symbols.map((symbol, index) => {
                   const data = stockDataMap[symbol]
                   const { shares, annualDividend, actualInvested } = calculateInvestment(symbol, data)
@@ -1186,35 +1186,30 @@ export function ETFComparison() {
                   }
                   
                   return (
-                    <div 
-                      key={symbol} 
-                      className="rounded-2xl bg-card border border-border p-5 transition-all"
+                    <div
+                      key={symbol}
+                      className="rounded-xl bg-card border border-border p-3.5"
                     >
-                      {/* Stock Header */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <TickerLogo symbol={symbol} label={data?.name} size={40} fallbackColor={COLORS[index]} />
+                      {/* Header + 수량 조절 (한 줄) */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <TickerLogo symbol={symbol} label={data?.name} size={32} fallbackColor={COLORS[index]} />
                           <div className="min-w-0">
-                            <div className="text-base font-semibold text-foreground leading-tight">{symbol}</div>
-                            {data?.name && (
-                              <div className="text-[11px] text-muted-foreground truncate max-w-[160px] leading-tight" title={data.name}>
-                                {data.name}
-                              </div>
-                            )}
-                            <div className="text-xs text-muted-foreground">
-                              1주 = ₩{pricePerShareKRW.toLocaleString()}
+                            <div className="text-sm font-semibold text-foreground leading-tight truncate">{symbol}</div>
+                            <div className="text-[11px] text-muted-foreground leading-tight">
+                              1주 ₩{pricePerShareKRW.toLocaleString()}
                             </div>
                           </div>
                         </div>
-                        
-                        {/* Toss Style Quantity Control */}
-                        <div className="flex items-center gap-1">
+
+                        {/* 수량 컨트롤 */}
+                        <div className="flex items-center gap-0.5 flex-shrink-0">
                           <button
                             onClick={() => updateShares(shares - 1)}
                             disabled={shares <= 0}
-                            className="w-9 h-9 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            className="w-7 h-7 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                           >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
                             </svg>
                           </button>
@@ -1225,45 +1220,44 @@ export function ETFComparison() {
                               const val = parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0
                               updateShares(val)
                             }}
-                            className="w-14 h-9 text-center bg-transparent text-lg font-bold tabular-nums text-foreground focus:outline-none"
+                            className="w-11 h-7 text-center bg-transparent text-base font-bold tabular-nums text-foreground focus:outline-none"
                           />
                           <button
                             onClick={() => updateShares(shares + 1)}
-                            className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center text-primary transition-colors"
+                            className="w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center text-primary transition-colors"
                           >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                             </svg>
                           </button>
                         </div>
                       </div>
 
-                      {/* Quick Add Buttons */}
-                      <div className="flex gap-2 mb-4">
+                      {/* 빠른 추가 (얇게) */}
+                      <div className="flex gap-1.5 mt-2.5">
                         {[1, 5, 10, 50].map((qty) => (
                           <button
                             key={qty}
                             onClick={() => updateShares(shares + qty)}
-                            className="flex-1 py-2 px-3 rounded-lg bg-muted/30 hover:bg-muted/50 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                            className="flex-1 py-1 rounded-md bg-muted/30 hover:bg-muted/50 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
                           >
-                            +{qty}주
+                            +{qty}
                           </button>
                         ))}
                       </div>
 
-                      {/* Result */}
+                      {/* 결과 (한 줄) */}
                       {shares > 0 && (
-                        <div className="rounded-xl bg-primary/5 p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm text-muted-foreground">투자금액</span>
-                            <span className="text-base font-semibold text-foreground tabular-nums">₩{actualInvested.toLocaleString()}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">연 배당금{afterTax ? " (세후)" : ""}</span>
-                            <span className="text-lg font-bold text-primary tabular-nums">
+                        <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-border/60 text-xs">
+                          <span className="text-muted-foreground">
+                            투자 <span className="text-foreground font-semibold tabular-nums">₩{actualInvested.toLocaleString()}</span>
+                          </span>
+                          <span className="text-muted-foreground">
+                            연 배당{afterTax ? "(세후)" : ""}{" "}
+                            <span className="text-primary font-bold tabular-nums text-sm">
                               ₩{Math.round(annualDividend * afterTaxFactor(symbol, afterTax)).toLocaleString()}
                             </span>
-                          </div>
+                          </span>
                         </div>
                       )}
                     </div>
