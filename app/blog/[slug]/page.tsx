@@ -1,6 +1,6 @@
 import { blogPosts } from '@/lib/blog-posts'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Clock } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, User } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
@@ -229,15 +229,28 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     notFound()
   }
 
+  const url = `https://www.etfflow.kr/blog/${post.slug}`
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
     description: post.excerpt,
     datePublished: post.date,
+    dateModified: post.date,
+    inLanguage: 'ko-KR',
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     author: {
       '@type': 'Organization',
+      name: 'ETF Flow 편집팀',
+      url: 'https://www.etfflow.kr/about',
+    },
+    publisher: {
+      '@type': 'Organization',
       name: 'ETF Flow',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.etfflow.kr/etf-flow-logo.png',
+      },
     },
   }
 
@@ -260,6 +273,10 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           <header className="mb-8 pb-6 border-b border-border">
             <h1 className="text-4xl font-bold text-foreground mb-4">{post.title}</h1>
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-1">
+                <User className="w-4 h-4" />
+                ETF Flow 편집팀
+              </span>
               <span className="inline-flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 {formatDate(post.date)}
