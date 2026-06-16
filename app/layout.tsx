@@ -30,23 +30,14 @@ export const metadata: Metadata = {
     siteName: 'ETF Flow',
     title: 'ETF 비교 대시보드 | 배당 수익률 실시간 비교',
     description: '배당 및 자산 성장 분석 대시보드 - ETF 수익 비교.',
-    images: [
-      {
-        url: 'https://www.etfflow.kr/etf-flow-logo.png',
-        width: 1000,
-        height: 1000,
-        alt: 'ETF Flow - ETF 비교 분석 서비스',
-        type: 'image/png',
-      },
-    ],
+    // og:image는 app/opengraph-image.tsx에서 동적 생성
   },
-  
-  // Twitter Card
+
+  // Twitter Card (twitter:image는 app/twitter-image.tsx에서 생성)
   twitter: {
     card: 'summary_large_image',
     title: 'ETF 비교 대시보드 | 배당 수익률 실시간 비교',
     description: '배당 및 자산 성장 분석 대시보드 - ETF 수익 비교.',
-    images: ['https://www.etfflow.kr/etf-flow-logo.png'],
   },
   
   // 기타
