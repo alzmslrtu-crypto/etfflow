@@ -229,6 +229,11 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     notFound()
   }
 
+  // 함께 보면 좋은 글: 같은 카테고리 우선, 부족하면 다른 글로 채움 (내부 링크)
+  const sameCat = blogPosts.filter((p) => p.slug !== post.slug && p.category === post.category)
+  const others = blogPosts.filter((p) => p.slug !== post.slug && p.category !== post.category)
+  const related = [...sameCat, ...others].slice(0, 4)
+
   const url = `https://www.etfflow.kr/blog/${post.slug}`
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -292,6 +297,26 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           <div className="prose max-w-none space-y-1 mb-12">
             {renderMarkdown(post.content)}
           </div>
+
+          {/* 함께 보면 좋은 글 */}
+          {related.length > 0 && (
+            <section className="mt-12 pt-8 border-t border-border">
+              <h2 className="text-xl font-bold text-foreground mb-4">함께 보면 좋은 글</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {related.map((p) => (
+                  <Link
+                    key={p.slug}
+                    href={`/blog/${p.slug}`}
+                    className="block p-4 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                  >
+                    <div className="text-xs text-primary font-medium mb-1">{p.category}</div>
+                    <div className="font-semibold text-foreground leading-snug mb-1 line-clamp-2">{p.title}</div>
+                    <div className="text-xs text-muted-foreground line-clamp-2">{p.excerpt}</div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
 
           <footer className="mt-12 pt-8 border-t border-border">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
