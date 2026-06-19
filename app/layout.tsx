@@ -44,6 +44,9 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://www.etfflow.kr'),
   alternates: {
     canonical: 'https://www.etfflow.kr',
+    types: {
+      'application/rss+xml': 'https://www.etfflow.kr/rss',
+    },
   },
   verification: {
     google: 'ayK0cKwfSC7T9bxHxbFjSD85KeslW1KUBc8wFO52Vqs',
