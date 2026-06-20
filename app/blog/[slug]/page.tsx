@@ -123,7 +123,7 @@ function parseTable(lines: string[], startIdx: number): { element: React.ReactNo
   }
 }
 
-function renderMarkdown(content: string) {
+function renderMarkdown(content: string, headings: { id: string; text: string }[]) {
   const lines = content.split('\n')
   const elements: React.ReactNode[] = []
   let i = 0
@@ -150,8 +150,11 @@ function renderMarkdown(content: string) {
       continue
     }
     if (trimmed.startsWith('## ')) {
+      const text = trimmed.slice(3).replace(/\*\*/g, '').trim()
+      const id = `section-${headings.length}`
+      headings.push({ id, text })
       elements.push(
-        <h2 key={i} className="text-2xl font-bold text-foreground mt-6 mb-3">
+        <h2 key={i} id={id} className="text-2xl font-bold text-foreground mt-6 mb-3 scroll-mt-20">
           {parseInline(trimmed.slice(3))}
         </h2>
       )
@@ -294,9 +297,29 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </div>
           </header>
 
-          <div className="prose max-w-none space-y-1 mb-12">
-            {renderMarkdown(post.content)}
-          </div>
+          {(() => {
+            const headings: { id: string; text: string }[] = []
+            const body = renderMarkdown(post.content, headings)
+            return (
+              <>
+                {headings.length >= 3 && (
+                  <nav className="mb-8 rounded-2xl bg-secondary/30 p-5">
+                    <div className="text-sm font-bold text-foreground mb-3">목차</div>
+                    <ul className="space-y-1.5">
+                      {headings.map((h) => (
+                        <li key={h.id}>
+                          <a href={`#${h.id}`} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                            {h.text}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+                )}
+                <div className="prose max-w-none space-y-1 mb-12">{body}</div>
+              </>
+            )
+          })()}
 
           {/* 함께 보면 좋은 글 */}
           {related.length > 0 && (
