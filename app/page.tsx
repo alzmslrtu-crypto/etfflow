@@ -20,7 +20,7 @@ export default function Page() {
             수익을 계산해보세요
           </h1>
           <p className="text-lg sm:text-xl text-muted-foreground mb-10 leading-relaxed max-w-2xl">
-            SCHD, JEPI, VOO 등 인기 배당 ETF를 한눈에 비교하고 예상 배당금을 정확하게 계산합니다.
+            국내·미국 ETF 수익률을 실시간으로 비교하는 ETF 비교 사이트. SCHD, JEPI, VOO 등 인기 ETF를 한눈에 비교하고 예상 배당금을 정확하게 계산합니다.
           </p>
           <Link 
             href="#compare"

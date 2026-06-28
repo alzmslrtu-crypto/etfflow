@@ -14,9 +14,9 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   // 기본 SEO
-  title: 'ETF 비교 대시보드 | 배당 수익률 실시간 계산',
-  description: '배당 ETF 수익률 비교 분석. SCHD, JEPI, VOO, QQQ 실시간 가격, 배당금, 월별 수익 시뮬레이션. 투자금액별 예상 배당금 자동 계산.',
-  keywords: ['ETF 비교', 'ETF 수익률', '배당 ETF', 'SCHD', 'JEPI', 'JEPQ', 'VOO', 'QQQ', 'SPY', '배당금 계산기', 'ETF 배당수익률', '미국 ETF', '미국 ETF 추천', '월배당 ETF', '고배당 ETF', 'ETF 투자', '배당주 추천', 'S&P500 ETF', '나스닥 ETF', '투자 시뮬레이션', 'ETF 배당금', 'ETF 분석'],
+  title: 'ETF 비교 사이트 | 국내·미국 ETF 수익률 실시간 비교 대시보드',
+  description: '국내·미국 ETF 비교 사이트. SCHD, JEPI, VOO, QQQ 등 인기 ETF의 수익률·배당금·주가를 실시간으로 한눈에 비교 분석. 투자금액별 예상 배당금 자동 계산.',
+  keywords: ['ETF 비교', 'ETF 비교 사이트', 'ETF 수익률 비교', 'ETF 수익률 비교 사이트', '국내 ETF 비교 사이트', '미국 ETF 비교 사이트', '해외 ETF 비교 사이트', '미국 ETF 수익률 비교', 'ETF 수익률', '배당 ETF', 'SCHD', 'JEPI', 'JEPQ', 'VOO', 'QQQ', 'SPY', '배당금 계산기', 'ETF 배당수익률', '미국 ETF', '미국 ETF 추천', '월배당 ETF', '고배당 ETF', 'ETF 투자', '배당주 추천', 'S&P500 ETF', '나스닥 ETF', '투자 시뮬레이션', 'ETF 배당금', 'ETF 분석'],
   authors: [{ name: 'ETF Flow' }],
   creator: 'ETF Flow',
   publisher: 'ETF Flow',
@@ -28,16 +28,16 @@ export const metadata: Metadata = {
     locale: 'ko_KR',
     url: 'https://www.etfflow.kr',
     siteName: 'ETF Flow',
-    title: 'ETF 비교 대시보드 | 배당 수익률 실시간 비교',
-    description: '배당 및 자산 성장 분석 대시보드 - ETF 수익 비교.',
+    title: 'ETF 비교 사이트 | 국내·미국 ETF 수익률 실시간 비교',
+    description: '국내·미국 ETF의 수익률·배당금을 실시간으로 비교 분석하는 ETF 비교 사이트.',
     // og:image는 app/opengraph-image.tsx에서 동적 생성
   },
 
   // Twitter Card (twitter:image는 app/twitter-image.tsx에서 생성)
   twitter: {
     card: 'summary_large_image',
-    title: 'ETF 비교 대시보드 | 배당 수익률 실시간 비교',
-    description: '배당 및 자산 성장 분석 대시보드 - ETF 수익 비교.',
+    title: 'ETF 비교 사이트 | 국내·미국 ETF 수익률 실시간 비교',
+    description: '국내·미국 ETF의 수익률·배당금을 실시간으로 비교 분석하는 ETF 비교 사이트.',
   },
   
   // 기타
