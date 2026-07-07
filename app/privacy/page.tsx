@@ -13,7 +13,7 @@ export default function PrivacyPolicy() {
     <main className="min-h-screen bg-background py-12">
       <div className="max-w-3xl mx-auto px-4">
         <h1 className="text-4xl font-bold text-foreground mb-2">개인정보처리방침</h1>
-        <p className="text-sm text-muted-foreground mb-6">시행일: 2025년 1월 1일 | 최종 수정: 2025년 5월 20일</p>
+        <p className="text-sm text-muted-foreground mb-6">시행일: 2025년 1월 1일 | 최종 수정: 2026년 7월 7일</p>
         
         <div className="prose prose-invert max-w-none space-y-6 text-muted-foreground text-sm">
           <section>
