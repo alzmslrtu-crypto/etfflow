@@ -3,6 +3,10 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { TickerLogo } from "@/components/ticker-logo"
 import { ETF_DIRECTORY, type EtfInfo } from "@/lib/etf-directory"
+import { getEtfSummaries, type EtfSummary } from "@/lib/etf-quote"
+
+// 시세 데이터를 1시간마다 갱신 (ISR)
+export const revalidate = 3600
 
 export const metadata: Metadata = {
   title: "배당 ETF 모음·추천 리스트 | ETF Flow",
@@ -46,7 +50,7 @@ const GROUPS: Group[] = [
   },
 ]
 
-function EtfCard({ etf }: { etf: EtfInfo }) {
+function EtfCard({ etf, live }: { etf: EtfInfo; live?: EtfSummary }) {
   return (
     <Link
       href={`/etf/${encodeURIComponent(etf.symbol)}`}
@@ -58,13 +62,24 @@ function EtfCard({ etf }: { etf: EtfInfo }) {
         <div className="text-xs text-muted-foreground truncate">
           {etf.dividendCycle !== "비정기" ? `${etf.dividendCycle} 배당 · ` : ""}{etf.issuer}
         </div>
+        {live && live.dividendYield > 0 && (
+          <div className="text-xs mt-1 tabular-nums">
+            <span className="text-primary font-semibold">배당수익률 {live.dividendYield.toFixed(2)}%</span>
+            {live.expenseRatio > 0 && (
+              <span className="text-muted-foreground"> · 운용보수 {live.expenseRatio.toFixed(2)}%</span>
+            )}
+          </div>
+        )}
       </div>
       <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
     </Link>
   )
 }
 
-export default function EtfIndexPage() {
+export default async function EtfIndexPage() {
+  // 목록에 실시간 배당수익률·운용보수를 함께 렌더한다(크롤러가 읽을 수 있게 HTML에 포함).
+  const live = await getEtfSummaries(ETF_DIRECTORY.map((e) => e.symbol))
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
       <div className="max-w-5xl mx-auto px-4 py-10 sm:py-16">
@@ -96,7 +111,7 @@ export default function EtfIndexPage() {
                 <p className="text-sm text-muted-foreground mb-4">{group.desc}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {items.map((etf) => (
-                    <EtfCard key={etf.symbol} etf={etf} />
+                    <EtfCard key={etf.symbol} etf={etf} live={live[etf.symbol]} />
                   ))}
                 </div>
               </section>

@@ -55,13 +55,22 @@ function assets(v: number, currency: string): string {
 
 const CYCLE_LABEL: Record<number, string> = { 12: "매월", 4: "분기", 2: "반기", 1: "연 1회" }
 
-export function EtfLiveStats({ symbol }: { symbol: string }) {
-  const [data, setData] = useState<StockData | null>(null)
-  const [loading, setLoading] = useState(true)
+export function EtfLiveStats({
+  symbol,
+  initialData,
+}: {
+  symbol: string
+  // 서버에서 미리 받아온 데이터. 있으면 첫 렌더부터 지표가 HTML에 찍힌다(SEO·크롤러용).
+  initialData?: StockData
+}) {
+  const [data, setData] = useState<StockData | null>(initialData ?? null)
+  const [loading, setLoading] = useState(!initialData)
   const [error, setError] = useState(false)
   const [added, setAdded] = useState(false)
 
   useEffect(() => {
+    // 서버에서 이미 받아왔으면 다시 요청하지 않는다.
+    if (initialData) return
     let active = true
     setLoading(true)
     setError(false)
@@ -79,7 +88,7 @@ export function EtfLiveStats({ symbol }: { symbol: string }) {
     return () => {
       active = false
     }
-  }, [symbol])
+  }, [symbol, initialData])
 
   // 비교 도구에 종목 추가 후 홈으로 이동
   const addToCompare = () => {

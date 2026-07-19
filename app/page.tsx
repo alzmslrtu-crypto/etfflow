@@ -4,37 +4,43 @@ import { ArrowRight, BarChart3, Wallet, TrendingUp } from "lucide-react"
 import { TickerLogo } from "@/components/ticker-logo"
 import { ETF_DIRECTORY } from "@/lib/etf-directory"
 import { FAQ_ITEMS } from "@/lib/faq"
+import { getEtfSummaries } from "@/lib/etf-quote"
 
-export default function Page() {
+// 시세 데이터를 1시간마다 갱신 (ISR)
+export const revalidate = 3600
+
+export default async function Page() {
+  // 인기 ETF 그리드에 실시간 지표를 함께 렌더한다(크롤러가 읽을 수 있게 HTML에 포함).
+  const popular = ETF_DIRECTORY.slice(0, 12)
+  const live = await getEtfSummaries(popular.map((e) => e.symbol))
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
       {/* Hero Section - Toss Style */}
-      <div className="py-20 sm:py-28 md:py-36 px-4">
+      <div className="pt-10 pb-6 sm:pt-14 sm:pb-8 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-6 inline-block px-3 py-1.5 bg-primary/10 rounded-full">
+          <div className="mb-4 inline-block px-3 py-1.5 bg-primary/10 rounded-full">
             <span className="text-sm font-semibold text-primary">ETF Flow</span>
           </div>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-foreground mb-6 leading-tight tracking-tight">
-            배당 ETF<br />
-            <span className="text-primary">쉽게 비교</span>하고<br />
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight tracking-tight">
+            배당 ETF <span className="text-primary">쉽게 비교</span>하고<br />
             수익을 계산해보세요
           </h1>
-          <p className="text-lg sm:text-xl text-muted-foreground mb-10 leading-relaxed max-w-2xl">
+          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl">
             국내·미국 ETF 수익률을 실시간으로 비교하는 ETF 비교 사이트. SCHD, JEPI, VOO 등 인기 ETF를 한눈에 비교하고 예상 배당금을 정확하게 계산합니다.
           </p>
-          <Link 
-            href="#compare"
-            className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all"
-          >
-            지금 비교하기
-            <ArrowRight className="w-5 h-5" />
-          </Link>
         </div>
       </div>
 
       {/* ETF Comparison Tool */}
-      <div id="compare" className="max-w-6xl mx-auto px-4 py-12 sm:py-16">
+      <div id="compare" className="max-w-6xl mx-auto px-4 pb-12 sm:pb-16">
         <ETFComparison />
+        <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
+          데이터 출처: 미국 상장 ETF는 Yahoo Finance, 국내 상장 ETF는 네이버 금융. 시세는 최대 1시간 지연될 수 있으며
+          배당수익률은 최근 1년 실지급 배당 기준입니다. 표시 금액은 세전이며, 세후 실수령액은{' '}
+          <Link href="/tools/tax" className="text-primary hover:underline">배당소득세 계산기</Link>에서 확인하세요.
+          모든 정보는 투자 권유가 아닙니다.
+        </p>
       </div>
 
       {/* Features Section */}
@@ -96,20 +102,31 @@ export default function Page() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {ETF_DIRECTORY.slice(0, 12).map((etf) => (
-              <Link
-                key={etf.symbol}
-                href={`/etf/${encodeURIComponent(etf.symbol)}`}
-                className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-              >
-                <TickerLogo symbol={etf.symbol} label={etf.name} size={40} />
-                <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-foreground truncate">{etf.name}</div>
-                  <div className="text-xs text-muted-foreground truncate">{etf.category}</div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-              </Link>
-            ))}
+            {popular.map((etf) => {
+              const stats = live[etf.symbol]
+              return (
+                <Link
+                  key={etf.symbol}
+                  href={`/etf/${encodeURIComponent(etf.symbol)}`}
+                  className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                >
+                  <TickerLogo symbol={etf.symbol} label={etf.name} size={40} />
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-foreground truncate">{etf.name}</div>
+                    <div className="text-xs text-muted-foreground truncate">{etf.category}</div>
+                    {stats && stats.dividendYield > 0 && (
+                      <div className="text-xs mt-1 tabular-nums">
+                        <span className="text-primary font-semibold">배당수익률 {stats.dividendYield.toFixed(2)}%</span>
+                        {stats.expenseRatio > 0 && (
+                          <span className="text-muted-foreground"> · 운용보수 {stats.expenseRatio.toFixed(2)}%</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                </Link>
+              )
+            })}
           </div>
         </div>
       </div>

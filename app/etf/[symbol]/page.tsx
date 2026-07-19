@@ -4,8 +4,12 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 import { TickerLogo } from "@/components/ticker-logo"
 import { EtfLiveStats } from "@/components/etf-live-stats"
 import { ETF_DIRECTORY, getRelatedEtfs, resolveEtfInfo } from "@/lib/etf-directory"
+import { getEtfQuote, type EtfQuote } from "@/lib/etf-quote"
 
 const BASE_URL = "https://www.etfflow.kr"
+
+// 시세·배당 데이터를 1시간마다 갱신 (ISR)
+export const revalidate = 3600
 
 // 디렉터리에 있는 종목들은 미리 정적 생성 (SEO/색인)
 export function generateStaticParams() {
@@ -27,8 +31,8 @@ export async function generateMetadata({
     description,
     alternates: { canonical: url },
     openGraph: { title, description, url, type: "website" },
-    // 자동 생성 종목 상세는 색인 제외(scaled content 감점 방지). 허브(/etf)·블로그 중심으로 색인
-    robots: { index: false, follow: true },
+    // 실시간 시세·배당 지표를 서버에서 렌더하므로 종목마다 고유 데이터가 있다 → 색인 허용.
+    // (compare/glossary 개별 페이지는 아직 얇아서 noindex 유지)
   }
 }
 
@@ -42,6 +46,15 @@ export default async function EtfDetailPage({
   const info = resolveEtfInfo(symbol)
   const related = getRelatedEtfs(symbol)
   const isKR = info.region === "KR"
+
+  // 시세·배당 지표를 서버에서 미리 받아 첫 HTML에 포함시킨다.
+  // 실패해도 페이지는 살아야 하므로 클라이언트 fetch로 폴백한다.
+  let quote: EtfQuote | undefined
+  try {
+    quote = await getEtfQuote(info.symbol, "5Y")
+  } catch {
+    quote = undefined
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
@@ -80,7 +93,7 @@ export default async function EtfDetailPage({
         {/* 실시간 지표 */}
         <section className="mb-10">
           <h2 className="text-lg font-bold text-foreground mb-4">실시간 시세 · 배당 정보</h2>
-          <EtfLiveStats symbol={info.symbol} />
+          <EtfLiveStats symbol={info.symbol} initialData={quote} />
         </section>
 
         {/* 상세 설명 */}
