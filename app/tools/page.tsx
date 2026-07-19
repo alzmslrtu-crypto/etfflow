@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Target, TrendingUp, Receipt, ArrowLeftRight, Percent, Compass } from "lucide-react"
+import { Target, TrendingUp, Receipt, ArrowLeftRight, Percent, Compass, SearchCheck } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "배당 투자 계산기 모음 | ETF Flow",
@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 }
 
 const TOOLS = [
+  { href: "/tools/real-return", icon: SearchCheck, title: "분배율 vs 실제 수익률", desc: "분배율 10% ETF, 정말 10% 벌어줬을까?" },
   { href: "/tools/dividend-goal", icon: Target, title: "월 배당금 목표 계산기", desc: "월 ○○만원 받으려면 얼마를 투자해야 할까?" },
   { href: "/tools/drip", icon: TrendingUp, title: "DRIP 복리 계산기", desc: "배당 재투자 시 10·20년 후 자산은 얼마?" },
   { href: "/tools/tax", icon: Receipt, title: "배당소득세 계산기", desc: "세금 떼고 실제로 받는 세후 배당금은?" },

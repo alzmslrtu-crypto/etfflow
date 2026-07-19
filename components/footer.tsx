@@ -32,6 +32,11 @@ export function Footer() {
                   회사 소개
                 </Link>
               </li>
+              <li>
+                <Link href="/author" className="text-muted-foreground hover:text-primary transition-colors">
+                  운영자 소개
+                </Link>
+              </li>
             </ul>
           </div>
 

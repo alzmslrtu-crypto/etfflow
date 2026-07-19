@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowLeft, Calendar, Clock, User } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import { AUTHOR } from '@/lib/author'
 
 // Generate static params for all blog posts
 export function generateStaticParams() {
@@ -248,9 +249,10 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     inLanguage: 'ko-KR',
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     author: {
-      '@type': 'Organization',
-      name: 'ETF Flow 편집팀',
-      url: 'https://www.etfflow.kr/about',
+      '@type': 'Person',
+      name: AUTHOR.name,
+      description: AUTHOR.title,
+      url: AUTHOR.url,
     },
     publisher: {
       '@type': 'Organization',
@@ -281,10 +283,10 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           <header className="mb-8 pb-6 border-b border-border">
             <h1 className="text-4xl font-bold text-foreground mb-4">{post.title}</h1>
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-1">
+              <Link href="/author" className="inline-flex items-center gap-1 hover:text-primary transition-colors">
                 <User className="w-4 h-4" />
-                ETF Flow 편집팀
-              </span>
+                {AUTHOR.name}
+              </Link>
               <span className="inline-flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 {formatDate(post.date)}
@@ -320,6 +322,23 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               </>
             )
           })()}
+
+          {/* 이 글을 쓴 사람 (E-E-A-T 신뢰 신호) */}
+          <section className="mt-12 pt-8 border-t border-border">
+            <div className="rounded-2xl bg-secondary/30 p-5">
+              <div className="text-sm font-bold text-foreground mb-2">이 글을 쓴 사람</div>
+              <Link href="/author" className="text-base font-semibold text-primary hover:underline">
+                {AUTHOR.name}
+              </Link>
+              <p className="text-sm text-muted-foreground mt-1">{AUTHOR.title}</p>
+              <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{AUTHOR.bio[0]}</p>
+              <p className="text-xs text-muted-foreground mt-3">
+                데이터 오류나 정정 요청은{' '}
+                <a href={`mailto:${AUTHOR.email}`} className="text-primary hover:underline">{AUTHOR.email}</a>
+                로 보내주세요.
+              </p>
+            </div>
+          </section>
 
           {/* 함께 보면 좋은 글 */}
           {related.length > 0 && (
