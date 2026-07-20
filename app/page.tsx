@@ -6,6 +6,7 @@ import { ETF_DIRECTORY, resolveEtfInfo } from "@/lib/etf-directory"
 import { FAQ_ITEMS } from "@/lib/faq"
 import { getEtfSummaries } from "@/lib/etf-quote"
 import { getDividendSafetyBatch } from "@/lib/dividend-safety"
+import { TickerSearch } from "@/components/ticker-search"
 
 // 시세 데이터를 1시간마다 갱신 (ISR)
 export const revalidate = 3600
@@ -25,20 +26,17 @@ export default async function Page() {
     .sort((a, b) => (b.cagr ?? -999) - (a.cagr ?? -999))
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
-      {/* Hero Section - Toss Style */}
-      <div className="pt-10 pb-6 sm:pt-14 sm:pb-8 px-4">
+    <main className="min-h-screen bg-background">
+      {/* 첫 화면은 문구가 아니라 입력창이다. 사용자는 이미 찾을 종목을 알고 온다. */}
+      <div className="pt-10 pb-8 sm:pt-14 px-4 border-b border-border">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-4 inline-block px-3 py-1.5 bg-primary/10 rounded-full">
-            <span className="text-sm font-semibold text-primary">ETF Flow</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight tracking-tight">
-            배당 ETF <span className="text-primary">쉽게 비교</span>하고<br />
-            수익을 계산해보세요
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 tracking-tight">
+            배당금이 얼마나, 언제, 계속 들어오는지
           </h1>
-          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-            국내·미국 ETF 수익률을 실시간으로 비교하는 ETF 비교 사이트. SCHD, JEPI, VOO 등 인기 ETF를 한눈에 비교하고 예상 배당금을 정확하게 계산합니다.
+          <p className="text-base text-muted-foreground mb-7">
+            국내·미국 ETF와 배당주의 실제 지급 기록을 확인하세요.
           </p>
+          <TickerSearch />
         </div>
       </div>
 
@@ -54,9 +52,9 @@ export default async function Page() {
       </div>
 
       {/* 배당 지속성 — 자기소개 대신 실제 지급 이력을 보여준다 */}
-      <div className="py-16 sm:py-20 px-4 bg-white/50">
+      <div className="py-12 px-4 bg-card">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
             이 ETF는 배당을 늘렸을까, 줄였을까
           </h2>
           <p className="text-base text-muted-foreground leading-relaxed mb-8">
@@ -88,16 +86,16 @@ export default async function Page() {
                         <div className="text-xs text-muted-foreground mt-0.5">{r.from}~{r.to} 연평균</div>
                       </td>
                       <td className={`p-3 text-right tabular-nums font-semibold ${
-                        r.cagr === null ? "text-muted-foreground" : r.cagr >= 0 ? "text-foreground" : "text-red-600"
+                        r.cagr === null ? "text-muted-foreground" : r.cagr >= 0 ? "text-foreground" : "text-stock-down"
                       }`}>
                         {r.cagr === null ? "—" : `${r.cagr >= 0 ? "+" : ""}${r.cagr.toFixed(1)}%`}
                       </td>
                       <td className="p-3 text-right tabular-nums">
                         {r.cutCount === 0
                           ? <span className="text-muted-foreground">없음</span>
-                          : <span className="text-red-600 font-medium">{r.cutCount}회</span>}
+                          : <span className="text-stock-down font-medium">{r.cutCount}회</span>}
                       </td>
-                      <td className={`p-3 text-right tabular-nums ${r.priceReturn < 0 ? "text-red-600" : "text-muted-foreground"}`}>
+                      <td className={`p-3 text-right tabular-nums ${r.priceReturn < 0 ? "text-stock-down" : "text-muted-foreground"}`}>
                         {r.priceReturn >= 0 ? "+" : ""}{r.priceReturn.toFixed(1)}%
                       </td>
                     </tr>
@@ -118,13 +116,13 @@ export default async function Page() {
       </div>
 
       {/* Popular ETF Detail Links */}
-      <div className="py-20 sm:py-28 px-4">
+      <div className="py-12 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               인기 ETF 상세 정보
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base text-muted-foreground">
               실시간 가격·배당수익률·배당월·운용보수를 종목별로 확인하세요.
             </p>
           </div>
@@ -160,13 +158,13 @@ export default async function Page() {
       </div>
 
       {/* Blog Section */}
-      <div className="py-20 sm:py-28 px-4 bg-white/50">
+      <div className="py-12 px-4 bg-card">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               배당 투자 가이드
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base text-muted-foreground">
               ETF 초보자부터 경험자까지 모두 배워갈 수 있는 실용적인 정보를 제공합니다.
             </p>
           </div>
@@ -221,10 +219,10 @@ export default async function Page() {
       </div>
 
       {/* FAQ Section */}
-      <div className="py-20 sm:py-28 px-4">
+      <div className="py-12 px-4">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               자주 묻는 질문
             </h2>
             <p className="text-lg text-muted-foreground">
@@ -253,24 +251,6 @@ export default async function Page() {
         </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="py-20 px-4 bg-primary text-primary-foreground">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            지금 바로 시작하세요
-          </h2>
-          <p className="text-lg opacity-90 mb-10 max-w-xl mx-auto">
-            복잡한 ETF 분석은 이제 그만. ETF Flow로 쉽고 빠르게 비교하세요.
-          </p>
-          <Link 
-            href="#compare"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-primary-foreground text-primary rounded-full font-bold hover:shadow-lg transition-all"
-          >
-            ETF 비교 시작하기
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
-      </div>
     </main>
   )
 }

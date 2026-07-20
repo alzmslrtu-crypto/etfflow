@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { IBM_Plex_Sans_KR, IBM_Plex_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
 import { Header } from '@/components/header'
@@ -7,10 +7,18 @@ import { Footer } from '@/components/footer'
 import { FAQ_ITEMS } from '@/lib/faq'
 import './globals.css'
 
-const inter = Inter({ 
-  subsets: ["latin"],
-  variable: '--font-inter',
-});
+// 본문은 Plex Sans KR, 금액·비율 등 모든 수치는 Plex Mono로 자릿수를 세로로 맞춘다.
+const plexSans = IBM_Plex_Sans_KR({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-plex-sans',
+})
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-plex-mono',
+})
 
 export const metadata: Metadata = {
   // 기본 SEO
@@ -95,7 +103,7 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="ko" className={`bg-background ${inter.variable}`}>
+    <html lang="ko" className={`bg-background ${plexSans.variable} ${plexMono.variable}`}>
       <head>
         <script
           type="application/ld+json"

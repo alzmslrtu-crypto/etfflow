@@ -5,36 +5,39 @@
 
 /* Toss-Inspired Clean & Modern Theme */
 :root {
-  --background: #ffffff;
-  --foreground: #0d1117;
-  --card: #f6f8fb;
-  --card-foreground: #0d1117;
+  /* 배당 통장(passbook) 팔레트.
+     장식용 색을 두지 않는다 — 초록은 들어온 돈, 빨강은 줄어든 돈이다.
+     ink / paper / rule / credit / debit 다섯 가지로만 화면을 구성한다. */
+  --background: #faf9f6;  /* paper */
+  --foreground: #16191f;  /* ink */
+  --card: #ffffff;
+  --card-foreground: #16191f;
   --popover: #ffffff;
-  --popover-foreground: #0d1117;
-  --primary: #0047ff;
+  --popover-foreground: #16191f;
+  --primary: #1b6b4c;     /* credit — 배당이 들어오는 방향 */
   --primary-foreground: #ffffff;
-  --secondary: #f0f2f5;
-  --secondary-foreground: #424856;
-  --muted: #dfe1e6;
-  --muted-foreground: #5f6368;
-  --accent: #0047ff;
+  --secondary: #f2f0ea;
+  --secondary-foreground: #4a4740;
+  --muted: #e2dfd8;
+  --muted-foreground: #6b675e;
+  --accent: #1b6b4c;
   --accent-foreground: #ffffff;
-  --destructive: #ff4458;
+  --destructive: #a33a2e;  /* debit */
   --destructive-foreground: #ffffff;
-  --border: #e8eaed;
-  --input: #f6f8fb;
-  --ring: #0047ff;
-  --radius: 0.75rem;
+  --border: #e2dfd8;       /* rule — 통장 괘선 */
+  --input: #ffffff;
+  --ring: #1b6b4c;
+  --radius: 0.375rem;      /* 기록물답게 각지게. 0은 아님 */
   
   /* Stock colors */
-  --stock-up: #06a77d;
-  --stock-down: #ff4458;
-  --stock-blue: #0047ff;
+  --stock-up: #1b6b4c;    /* credit */
+  --stock-down: #a33a2e;  /* debit */
+  --stock-blue: #1b6b4c;
 }
 
 @theme inline {
-  --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'SF Mono', 'Monaco', 'Menlo', monospace;
+  --font-sans: var(--font-plex-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-plex-mono), 'SF Mono', 'Monaco', monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -72,7 +75,16 @@
   }
 }
 
-/* Tabular number alignment for consistent digit width */
+/* 금액·비율은 전부 mono 고정폭으로 찍어 자릿수를 세로로 맞춘다.
+   기존 코드가 이미 tabular-nums를 쓰고 있어, 이 클래스에 mono를 얹으면
+   화면을 일일이 고치지 않고도 통장 정렬이 사이트 전체에 적용된다. */
 .tabular-nums {
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* 통장 괘선 — 지급 내역처럼 줄이 이어지는 목록에 쓴다 */
+.ledger > * + * {
+  border-top: 1px solid var(--border);
 }

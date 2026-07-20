@@ -76,7 +76,7 @@ export default async function DividendSafetyPage() {
                       </div>
                     </td>
                     <td className={`p-3 text-right tabular-nums font-semibold ${
-                      r.cagr === null ? "text-muted-foreground" : r.cagr >= 0 ? "text-foreground" : "text-red-600"
+                      r.cagr === null ? "text-muted-foreground" : r.cagr >= 0 ? "text-foreground" : "text-stock-down"
                     }`}>
                       {r.cagr === null ? "—" : pct(r.cagr)}
                     </td>
@@ -84,13 +84,13 @@ export default async function DividendSafetyPage() {
                       {r.cutCount === 0 ? (
                         <span className="text-muted-foreground">없음</span>
                       ) : (
-                        <span className="text-red-600 font-medium">
+                        <span className="text-stock-down font-medium">
                           {r.cutCount}회
                           <span className="block text-xs font-normal">최대 −{r.worstCut.toFixed(0)}%</span>
                         </span>
                       )}
                     </td>
-                    <td className={`p-3 text-right tabular-nums ${r.priceReturn < 0 ? "text-red-600" : "text-muted-foreground"}`}>
+                    <td className={`p-3 text-right tabular-nums ${r.priceReturn < 0 ? "text-stock-down" : "text-muted-foreground"}`}>
                       {pct(r.priceReturn)}
                     </td>
                     <td className="p-3 text-right tabular-nums text-muted-foreground">
