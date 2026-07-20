@@ -1,18 +1,28 @@
 import { ETFComparison } from "@/components/etf-comparison"
 import Link from "next/link"
-import { ArrowRight, BarChart3, Wallet, TrendingUp } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { TickerLogo } from "@/components/ticker-logo"
-import { ETF_DIRECTORY } from "@/lib/etf-directory"
+import { ETF_DIRECTORY, resolveEtfInfo } from "@/lib/etf-directory"
 import { FAQ_ITEMS } from "@/lib/faq"
 import { getEtfSummaries } from "@/lib/etf-quote"
+import { getDividendSafetyBatch } from "@/lib/dividend-safety"
 
 // 시세 데이터를 1시간마다 갱신 (ISR)
 export const revalidate = 3600
 
+// 홈에 배당 성장/삭감 대비가 드러나는 대표 종목만 싣는다. 전체는 /dividend-safety.
+const SAFETY_PREVIEW = ["SCHD", "VOO", "JEPI", "JEPQ", "QYLD"]
+
 export default async function Page() {
   // 인기 ETF 그리드에 실시간 지표를 함께 렌더한다(크롤러가 읽을 수 있게 HTML에 포함).
   const popular = ETF_DIRECTORY.slice(0, 12)
-  const live = await getEtfSummaries(popular.map((e) => e.symbol))
+  const [live, safetyRows] = await Promise.all([
+    getEtfSummaries(popular.map((e) => e.symbol)),
+    getDividendSafetyBatch(SAFETY_PREVIEW),
+  ])
+  const safety = safetyRows
+    .filter((r) => r.sufficient)
+    .sort((a, b) => (b.cagr ?? -999) - (a.cagr ?? -999))
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
@@ -43,54 +53,72 @@ export default async function Page() {
         </p>
       </div>
 
-      {/* Features Section */}
-      <div className="py-20 sm:py-28 px-4 bg-white/50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
-              ETF Flow만의 특징
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              복잡한 투자 정보를 간단하고 명확하게 정리해 드립니다.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                <BarChart3 className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">실시간 비교 분석</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                여러 배당 ETF의 수익률, 배당율, 주가를 한눈에 비교하고 트렌드를 파악하세요.
-              </p>
-            </div>
+      {/* 배당 지속성 — 자기소개 대신 실제 지급 이력을 보여준다 */}
+      <div className="py-16 sm:py-20 px-4 bg-white/50">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">
+            이 ETF는 배당을 늘렸을까, 줄였을까
+          </h2>
+          <p className="text-base text-muted-foreground leading-relaxed mb-8">
+            지금 배당수익률이 높다는 것과 앞으로도 그 배당이 나온다는 것은 다릅니다.
+            실제 지급 이력만 놓고 계산한 최근 배당 성장률입니다.
+          </p>
 
-            <div className="p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                <Wallet className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">배당금 계산기</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                투자금액을 입력하면 예상 배당금과 월별 수익을 자동으로 계산해 드립니다.
-              </p>
+          {safety.length > 0 && (
+            <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+              <table className="w-full text-sm min-w-[520px]">
+                <thead>
+                  <tr className="border-b border-border text-muted-foreground">
+                    <th className="text-left font-medium p-3">ETF</th>
+                    <th className="text-right font-medium p-3">배당 성장률</th>
+                    <th className="text-right font-medium p-3">삭감</th>
+                    <th className="text-right font-medium p-3">주가 변동</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {safety.map((r) => (
+                    <tr key={r.symbol} className="border-b border-border last:border-0">
+                      <td className="p-3">
+                        <Link
+                          href={`/etf/${encodeURIComponent(r.symbol)}`}
+                          className="font-semibold text-foreground hover:text-primary transition-colors"
+                        >
+                          {resolveEtfInfo(r.symbol).name}
+                        </Link>
+                        <div className="text-xs text-muted-foreground mt-0.5">{r.from}~{r.to} 연평균</div>
+                      </td>
+                      <td className={`p-3 text-right tabular-nums font-semibold ${
+                        r.cagr === null ? "text-muted-foreground" : r.cagr >= 0 ? "text-foreground" : "text-red-600"
+                      }`}>
+                        {r.cagr === null ? "—" : `${r.cagr >= 0 ? "+" : ""}${r.cagr.toFixed(1)}%`}
+                      </td>
+                      <td className="p-3 text-right tabular-nums">
+                        {r.cutCount === 0
+                          ? <span className="text-muted-foreground">없음</span>
+                          : <span className="text-red-600 font-medium">{r.cutCount}회</span>}
+                      </td>
+                      <td className={`p-3 text-right tabular-nums ${r.priceReturn < 0 ? "text-red-600" : "text-muted-foreground"}`}>
+                        {r.priceReturn >= 0 ? "+" : ""}{r.priceReturn.toFixed(1)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          )}
 
-            <div className="p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                <TrendingUp className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">스마트 인사이트</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                복리 효과를 극대화하는 전략과 배당금 재투자 팁을 제공합니다.
-              </p>
-            </div>
-          </div>
+          <Link
+            href="/dividend-safety"
+            className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+          >
+            전체 ETF 배당 삭감 이력 보기
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
 
       {/* Popular ETF Detail Links */}
-      <div className="py-20 sm:py-28 px-4 bg-white/50">
+      <div className="py-20 sm:py-28 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
@@ -132,7 +160,7 @@ export default async function Page() {
       </div>
 
       {/* Blog Section */}
-      <div className="py-20 sm:py-28 px-4">
+      <div className="py-20 sm:py-28 px-4 bg-white/50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
@@ -193,7 +221,7 @@ export default async function Page() {
       </div>
 
       {/* FAQ Section */}
-      <div className="py-20 sm:py-28 px-4 bg-white/50">
+      <div className="py-20 sm:py-28 px-4">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">

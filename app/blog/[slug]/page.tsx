@@ -182,6 +182,18 @@ function renderMarkdown(content: string, headings: { id: string; text: string }[
       }
     }
 
+    // Blockquote — 여러 글이 이미 '> '를 쓰고 있는데 처리하지 않아
+    // 본문에 '>' 기호가 그대로 노출되고 있었다.
+    if (trimmed.startsWith('> ')) {
+      elements.push(
+        <blockquote key={i} className="border-l-4 border-primary/40 bg-secondary/30 rounded-r-xl px-4 py-3 my-4 text-muted-foreground leading-relaxed">
+          {parseInline(trimmed.slice(2))}
+        </blockquote>
+      )
+      i++
+      continue
+    }
+
     // Unordered list
     if (trimmed.startsWith('- ')) {
       elements.push(
