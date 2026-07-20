@@ -27,21 +27,21 @@ export default async function Page() {
 
   return (
     <main className="min-h-screen bg-background">
-      {/* 첫 화면은 문구가 아니라 입력창이다. 사용자는 이미 찾을 종목을 알고 온다. */}
-      <div className="pt-10 pb-8 sm:pt-14 px-4 border-b border-border">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 tracking-tight">
-            배당금이 얼마나, 언제, 계속 들어오는지
+      {/* 첫 화면은 문구가 아니라 기입란이다. 사용자는 이미 찾을 종목을 알고 온다. */}
+      <div className="pt-12 pb-10 sm:pt-20 sm:pb-14 px-4">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl sm:text-5xl font-bold text-foreground mb-3 tracking-[-0.03em] leading-[1.15]">
+            배당금이 얼마나,<br />언제, 계속 들어오는지
           </h1>
-          <p className="text-base text-muted-foreground mb-7">
-            국내·미국 ETF와 배당주의 실제 지급 기록을 확인하세요.
+          <p className="text-base text-muted-foreground mb-10">
+            국내·미국 ETF와 배당주의 실제 지급 기록.
           </p>
           <TickerSearch />
         </div>
       </div>
 
       {/* ETF Comparison Tool */}
-      <div id="compare" className="max-w-6xl mx-auto px-4 pb-12 sm:pb-16">
+      <div id="compare" className="max-w-3xl mx-auto px-4 pb-12 sm:pb-16">
         <ETFComparison />
         <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
           데이터 출처: 미국 상장 ETF는 Yahoo Finance, 국내 상장 ETF는 네이버 금융. 시세는 최대 1시간 지연될 수 있으며
@@ -51,105 +51,106 @@ export default async function Page() {
         </p>
       </div>
 
-      {/* 배당 지속성 — 자기소개 대신 실제 지급 이력을 보여준다 */}
-      <div className="py-12 px-4 bg-card">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground mb-2">
-            이 ETF는 배당을 늘렸을까, 줄였을까
-          </h2>
-          <p className="text-base text-muted-foreground leading-relaxed mb-8">
-            지금 배당수익률이 높다는 것과 앞으로도 그 배당이 나온다는 것은 다릅니다.
-            실제 지급 이력만 놓고 계산한 최근 배당 성장률입니다.
-          </p>
+      {/* 배당 지속성 — 통장 내역처럼 괘선 위에 앉힌다 */}
+      <div className="px-4 pb-16">
+        <div className="max-w-3xl mx-auto">
+          <div className="rule-double pt-3 mb-1 flex items-baseline justify-between">
+            <span className="eyebrow">배당 지속성</span>
+            <span className="eyebrow">
+              {safety.length > 0 ? `${safety[0].from}—${safety[0].to}` : "연평균"}
+            </span>
+          </div>
 
-          {safety.length > 0 && (
-            <div className="overflow-x-auto rounded-2xl border border-border bg-card">
-              <table className="w-full text-sm min-w-[520px]">
-                <thead>
-                  <tr className="border-b border-border text-muted-foreground">
-                    <th className="text-left font-medium p-3">ETF</th>
-                    <th className="text-right font-medium p-3">배당 성장률</th>
-                    <th className="text-right font-medium p-3">삭감</th>
-                    <th className="text-right font-medium p-3">주가 변동</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {safety.map((r) => (
-                    <tr key={r.symbol} className="border-b border-border last:border-0">
-                      <td className="p-3">
-                        <Link
-                          href={`/etf/${encodeURIComponent(r.symbol)}`}
-                          className="font-semibold text-foreground hover:text-primary transition-colors"
-                        >
-                          {resolveEtfInfo(r.symbol).name}
-                        </Link>
-                        <div className="text-xs text-muted-foreground mt-0.5">{r.from}~{r.to} 연평균</div>
-                      </td>
-                      <td className={`p-3 text-right tabular-nums font-semibold ${
-                        r.cagr === null ? "text-muted-foreground" : r.cagr >= 0 ? "text-foreground" : "text-stock-down"
-                      }`}>
-                        {r.cagr === null ? "—" : `${r.cagr >= 0 ? "+" : ""}${r.cagr.toFixed(1)}%`}
-                      </td>
-                      <td className="p-3 text-right tabular-nums">
-                        {r.cutCount === 0
-                          ? <span className="text-muted-foreground">없음</span>
-                          : <span className="text-stock-down font-medium">{r.cutCount}회</span>}
-                      </td>
-                      <td className={`p-3 text-right tabular-nums ${r.priceReturn < 0 ? "text-stock-down" : "text-muted-foreground"}`}>
-                        {r.priceReturn >= 0 ? "+" : ""}{r.priceReturn.toFixed(1)}%
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <div className="bg-card border border-border">
+            {safety.map((r) => (
+              <Link
+                key={r.symbol}
+                href={`/etf/${encodeURIComponent(r.symbol)}`}
+                className="ledger-row grid-cols-[1fr_auto] sm:grid-cols-[1fr_7rem_6rem] border-b border-border last:border-0 hover:bg-secondary transition-colors group"
+              >
+                <div className="min-w-0">
+                  <div className="font-mono font-semibold text-foreground group-hover:text-primary transition-colors">
+                    {r.symbol.replace(/\.(KS|KQ)$/, "")}
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate mt-0.5">
+                    {resolveEtfInfo(r.symbol).name}
+                  </div>
+                </div>
 
-          <Link
-            href="/dividend-safety"
-            className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-          >
-            전체 ETF 배당 삭감 이력 보기
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+                <div className="text-right">
+                  <div
+                    className={`figure text-2xl sm:text-3xl leading-none ${
+                      r.cagr === null ? "text-muted-foreground" : r.cagr >= 0 ? "text-primary" : "text-stock-down"
+                    }`}
+                  >
+                    {r.cagr === null ? "—" : `${r.cagr >= 0 ? "+" : "−"}${Math.abs(r.cagr).toFixed(1)}`}
+                    <span className="text-base">%</span>
+                  </div>
+                  <div className="eyebrow mt-1.5">배당 성장</div>
+                </div>
+
+                <div className="hidden sm:block text-right">
+                  <div className={`figure text-lg leading-none ${r.cutCount === 0 ? "text-muted-foreground" : "text-stock-down"}`}>
+                    {r.cutCount === 0 ? "없음" : `${r.cutCount}회`}
+                  </div>
+                  <div className="eyebrow mt-1.5">삭감</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-3 flex items-baseline justify-between gap-4">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              1주당 배당금이 매년 몇 퍼센트씩 변했는지. 주가와 무관한 값입니다.
+            </p>
+            <Link
+              href="/dividend-safety"
+              className="eyebrow whitespace-nowrap text-foreground hover:text-primary transition-colors"
+            >
+              전체 보기 →
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Popular ETF Detail Links */}
-      <div className="py-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              인기 ETF 상세 정보
-            </h2>
-            <p className="text-base text-muted-foreground">
-              실시간 가격·배당수익률·배당월·운용보수를 종목별로 확인하세요.
-            </p>
+      <div className="px-4 pb-16">
+        <div className="max-w-3xl mx-auto">
+          <div className="rule-double pt-3 mb-1 flex items-baseline justify-between">
+            <span className="eyebrow">인기 종목</span>
+            <span className="eyebrow">배당수익률 · 운용보수</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="bg-card border border-border">
             {popular.map((etf) => {
               const stats = live[etf.symbol]
               return (
                 <Link
                   key={etf.symbol}
                   href={`/etf/${encodeURIComponent(etf.symbol)}`}
-                  className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                  className="ledger-row grid-cols-[auto_1fr_auto] border-b border-border last:border-0 hover:bg-secondary transition-colors group"
                 >
-                  <TickerLogo symbol={etf.symbol} label={etf.name} size={40} />
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-foreground truncate">{etf.name}</div>
-                    <div className="text-xs text-muted-foreground truncate">{etf.category}</div>
-                    {stats && stats.dividendYield > 0 && (
-                      <div className="text-xs mt-1 tabular-nums">
-                        <span className="text-primary font-semibold">배당수익률 {stats.dividendYield.toFixed(2)}%</span>
+                  <TickerLogo symbol={etf.symbol} label={etf.name} size={28} />
+                  <div className="min-w-0 self-center">
+                    <div className="font-mono text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                      {etf.symbol.replace(/\.(KS|KQ)$/, "")}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate">{etf.name}</div>
+                  </div>
+                  <div className="text-right self-center">
+                    {stats && stats.dividendYield > 0 ? (
+                      <>
+                        <div className="figure text-lg leading-none text-foreground">
+                          {stats.dividendYield.toFixed(2)}<span className="text-xs">%</span>
+                        </div>
                         {stats.expenseRatio > 0 && (
-                          <span className="text-muted-foreground"> · 운용보수 {stats.expenseRatio.toFixed(2)}%</span>
+                          <div className="eyebrow mt-1">보수 {stats.expenseRatio.toFixed(2)}%</div>
                         )}
-                      </div>
+                      </>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
                     )}
                   </div>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 </Link>
               )
             })}
@@ -158,68 +159,38 @@ export default async function Page() {
       </div>
 
       {/* Blog Section */}
-      <div className="py-12 px-4 bg-card">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              배당 투자 가이드
-            </h2>
-            <p className="text-base text-muted-foreground">
-              ETF 초보자부터 경험자까지 모두 배워갈 수 있는 실용적인 정보를 제공합니다.
-            </p>
-          </div>
+      <div className="px-4 pb-16">
+        <div className="max-w-3xl mx-auto">
+          <div className="rule-double pt-3 mb-4">
+            <span className="eyebrow">배당 투자 가이드</span>
+            </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Link href="/blog/etf-beginners-guide" className="group p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <div className="inline-block px-3 py-1 bg-primary/10 rounded-full mb-4">
-                <span className="text-xs font-semibold text-primary">입문</span>
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                배당 ETF 완벽 가이드
-              </h3>
-              <p className="text-muted-foreground leading-relaxed mb-5">
-                배당 ETF란 무엇인지, 왜 투자해야 하는지 초보자를 위한 기본을 알아봅니다.
-              </p>
-              <span className="text-sm font-semibold text-primary flex items-center gap-2 group-hover:gap-3 transition-all">
-                자세히 보기 <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-            
-            <Link href="/blog/schd-vs-jepi" className="group p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <div className="inline-block px-3 py-1 bg-primary/10 rounded-full mb-4">
-                <span className="text-xs font-semibold text-primary">비교</span>
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                SCHD vs JEPI 비교분석
-              </h3>
-              <p className="text-muted-foreground leading-relaxed mb-5">
-                인기 배당 ETF들의 수익률, 배당률, 변동성을 상세히 비교 분석합니다.
-              </p>
-              <span className="text-sm font-semibold text-primary flex items-center gap-2 group-hover:gap-3 transition-all">
-                자세히 보기 <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-            
-            <Link href="/blog/dividend-reinvestment" className="group p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <div className="inline-block px-3 py-1 bg-primary/10 rounded-full mb-4">
-                <span className="text-xs font-semibold text-primary">전략</span>
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                배당금 재투자의 힘
-              </h3>
-              <p className="text-muted-foreground leading-relaxed mb-5">
-                복리 효과를 극대화하고 장기적인 자산을 축적하는 전략을 배워봅니다.
-              </p>
-              <span className="text-sm font-semibold text-primary flex items-center gap-2 group-hover:gap-3 transition-all">
-                자세히 보기 <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
+          <div className="bg-card border border-border">
+            {[
+              { href: "/blog/etf-beginners-guide", tag: "입문", title: "배당 ETF 완벽 가이드", desc: "배당 ETF란 무엇인지, 왜 투자하는지 기본부터." },
+              { href: "/blog/schd-vs-jepi", tag: "비교", title: "SCHD vs JEPI", desc: "배당은 2배인데 총수익은 더 낮았던 이유." },
+              { href: "/blog/dividend-reinvestment", tag: "전략", title: "배당금 재투자의 힘", desc: "받은 배당을 다시 넣으면 얼마나 달라지는지." },
+            ].map((post) => (
+              <Link
+                key={post.href}
+                href={post.href}
+                className="ledger-row grid-cols-[3.5rem_1fr] border-b border-border last:border-0 hover:bg-secondary transition-colors group"
+              >
+                <span className="eyebrow self-center">{post.tag}</span>
+                <div className="min-w-0">
+                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                    {post.title}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{post.desc}</div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </div>
 
       {/* FAQ Section */}
-      <div className="py-12 px-4">
+      <div className="px-4 pb-16">
         <div className="max-w-3xl mx-auto">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-foreground mb-2">
@@ -234,7 +205,7 @@ export default async function Page() {
             {FAQ_ITEMS.map((item) => (
               <details
                 key={item.question}
-                className="group bg-card rounded-2xl shadow-sm p-5 [&_summary::-webkit-details-marker]:hidden"
+                className="group bg-card border border-border p-5 [&_summary::-webkit-details-marker]:hidden"
               >
                 <summary className="flex items-center justify-between cursor-pointer list-none font-semibold text-foreground">
                   {item.question}

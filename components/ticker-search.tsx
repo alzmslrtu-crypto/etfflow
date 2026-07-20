@@ -76,11 +76,11 @@ export function TickerSearch() {
 
   return (
     <div className="relative" ref={boxRef}>
-      <label htmlFor="ticker-search" className="block text-sm text-muted-foreground mb-2">
-        종목 검색
+      <label htmlFor="ticker-search" className="eyebrow block mb-2">
+        종목 조회
       </label>
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
+      <div className="relative border-b-2 border-foreground focus-within:border-primary transition-colors">
+        <Search className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground pointer-events-none" />
         <input
           id="ticker-search"
           type="text"
@@ -94,12 +94,12 @@ export function TickerSearch() {
           onKeyDown={onKeyDown}
           placeholder="SCHD, TIGER 미국배당, 삼성전자"
           autoComplete="off"
-          className="w-full h-14 pl-12 pr-4 text-lg bg-card border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+          className="w-full h-16 pl-8 pr-4 text-2xl sm:text-3xl font-mono bg-transparent text-foreground placeholder:text-muted-foreground/60 placeholder:text-lg focus:outline-none"
         />
       </div>
 
       {open && (query.length > 0 || results.length > 0) && (
-        <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-md shadow-lg overflow-hidden">
+        <div className="absolute z-50 w-full bg-card border-x border-b border-foreground overflow-hidden">
           {loading ? (
             <div className="p-5 text-center">
               <Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
@@ -136,13 +136,13 @@ export function TickerSearch() {
         </div>
       )}
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-muted-foreground">자주 찾는 종목</span>
+      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+        <span className="eyebrow">자주 찾는 종목</span>
         {SUGGESTED.map((s) => (
           <button
             key={s}
             onClick={() => go(s)}
-            className="text-xs px-2 py-1 rounded border border-border bg-card text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors tabular-nums"
+            className="font-mono text-sm text-foreground/70 hover:text-primary underline underline-offset-4 decoration-border hover:decoration-primary transition-colors"
           >
             {s.replace(/\.(KS|KQ)$/, '')}
           </button>
