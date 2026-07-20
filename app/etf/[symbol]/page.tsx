@@ -3,8 +3,9 @@ import Link from "next/link"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { TickerLogo } from "@/components/ticker-logo"
 import { EtfLiveStats } from "@/components/etf-live-stats"
-import { ETF_DIRECTORY, getRelatedEtfs, resolveEtfInfo } from "@/lib/etf-directory"
+import { ETF_DIRECTORY, getEtfInfo, getRelatedEtfs, resolveEtfInfo } from "@/lib/etf-directory"
 import { getEtfQuote, type EtfQuote } from "@/lib/etf-quote"
+import { getDividendSafety } from "@/lib/dividend-safety"
 
 const BASE_URL = "https://www.etfflow.kr"
 
@@ -22,17 +23,25 @@ export async function generateMetadata({
   params: Promise<{ symbol: string }>
 }): Promise<Metadata> {
   const { symbol } = await params
-  const info = resolveEtfInfo(decodeURIComponent(symbol))
+  const decoded = decodeURIComponent(symbol)
+  const info = resolveEtfInfo(decoded)
   const title = `${info.name} 배당금·배당수익률·정보 | ETF Flow`
   const description = info.summary
   const url = `${BASE_URL}/etf/${encodeURIComponent(info.symbol)}`
+
+  // 이 라우트는 임의의 티커를 다 받는다(dynamicParams). 디렉터리에 없는 종목은
+  // 설명이 비어 있어 숫자만 있는 얇은 페이지가 되므로 색인에서 뺀다.
+  // 색인시키면 무한한 자동 생성 페이지가 되어 scaled content로 평가된다.
+  const isCurated = Boolean(getEtfInfo(decoded))
+
   return {
     title,
     description,
     alternates: { canonical: url },
     openGraph: { title, description, url, type: "website" },
-    // 실시간 시세·배당 지표를 서버에서 렌더하므로 종목마다 고유 데이터가 있다 → 색인 허용.
+    // 디렉터리 종목은 실시간 지표를 서버 렌더해 고유 데이터가 있으므로 색인 허용.
     // (compare/glossary 개별 페이지는 아직 얇아서 noindex 유지)
+    robots: isCurated ? undefined : { index: false, follow: true },
   }
 }
 
@@ -55,6 +64,10 @@ export default async function EtfDetailPage({
   } catch {
     quote = undefined
   }
+
+  // 배당수익률 바로 다음에 "그 배당이 유지됐나"를 보여준다.
+  // 수익률 숫자 하나만으로는 좋은 신호인지 나쁜 신호인지 구분되지 않는다.
+  const safety = await getDividendSafety(info.symbol)
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
@@ -95,6 +108,92 @@ export default async function EtfDetailPage({
           <h2 className="text-lg font-bold text-foreground mb-4">실시간 시세 · 배당 정보</h2>
           <EtfLiveStats symbol={info.symbol} initialData={quote} />
         </section>
+
+        {/* 배당 지속성 — 실지급 이력으로 계산 */}
+        {safety?.sufficient && (
+          <section className="mb-10">
+            <h2 className="text-lg font-bold text-foreground mb-1">배당을 계속 줬을까</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              {safety.from}~{safety.to}년 실제로 지급된 배당만 놓고 계산한 값입니다.
+            </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+              <div className="rounded-xl border border-border bg-card p-4">
+                <div className="text-xs text-muted-foreground mb-1">배당 성장률</div>
+                <div
+                  className={`text-xl font-bold tabular-nums ${
+                    safety.cagr === null ? "text-muted-foreground" : safety.cagr >= 0 ? "text-stock-up" : "text-stock-down"
+                  }`}
+                >
+                  {safety.cagr === null ? "—" : `${safety.cagr >= 0 ? "+" : ""}${safety.cagr.toFixed(1)}%`}
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">연평균</div>
+              </div>
+
+              <div className="rounded-xl border border-border bg-card p-4">
+                <div className="text-xs text-muted-foreground mb-1">배당 삭감</div>
+                <div className={`text-xl font-bold tabular-nums ${safety.cutCount === 0 ? "text-stock-up" : "text-stock-down"}`}>
+                  {safety.cutCount === 0 ? "없음" : `${safety.cutCount}회`}
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">
+                  {safety.cutCount === 0 ? "한 해도 줄지 않음" : `최대 −${safety.worstCut.toFixed(0)}%`}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border bg-card p-4">
+                <div className="text-xs text-muted-foreground mb-1">주가 변동</div>
+                <div className={`text-xl font-bold tabular-nums ${safety.priceReturn >= 0 ? "text-stock-up" : "text-stock-down"}`}>
+                  {safety.priceReturn >= 0 ? "+" : ""}{safety.priceReturn.toFixed(1)}%
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">기간 전체</div>
+              </div>
+
+              <div className="rounded-xl border border-border bg-card p-4">
+                <div className="text-xs text-muted-foreground mb-1">받은 배당 + 주가</div>
+                <div className={`text-xl font-bold tabular-nums ${safety.totalReturn >= 0 ? "text-stock-up" : "text-stock-down"}`}>
+                  {safety.totalReturn >= 0 ? "+" : ""}{safety.totalReturn.toFixed(1)}%
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">배당 {safety.dividendReturn.toFixed(1)}% 포함</div>
+              </div>
+            </div>
+
+            {/* 연도별 실지급 배당 — 통장 내역처럼 */}
+            <div className="rounded-xl border border-border bg-card overflow-hidden mb-3">
+              {safety.years.map((y, i) => {
+                const prev = i > 0 ? safety.years[i - 1].total : null
+                const change = prev && prev > 0 ? ((y.total - prev) / prev) * 100 : null
+                return (
+                  <div
+                    key={y.year}
+                    className="flex items-baseline justify-between gap-4 px-4 py-2.5 border-b border-border last:border-0"
+                  >
+                    <span className="text-sm text-muted-foreground tabular-nums">{y.year}</span>
+                    <span className="flex-1 border-b border-dotted border-border/70" />
+                    <span className="text-sm font-semibold text-foreground tabular-nums">
+                      {y.total.toLocaleString(undefined, { maximumFractionDigits: 4 })}
+                      <span className="text-xs text-muted-foreground ml-1">{isKR ? "원" : "달러"}</span>
+                    </span>
+                    <span
+                      className={`text-xs tabular-nums w-16 text-right ${
+                        change === null ? "text-muted-foreground" : change >= 0 ? "text-stock-up" : "text-stock-down"
+                      }`}
+                    >
+                      {change === null ? "—" : `${change >= 0 ? "+" : ""}${change.toFixed(1)}%`}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              1주당 연간 배당 합계입니다. 올해는 배당이 아직 다 지급되지 않아 제외했습니다.
+              세전·환율 미반영이며 배당 재투자는 가정하지 않았습니다.{" "}
+              <Link href="/dividend-safety" className="text-primary hover:underline">
+                다른 ETF와 비교
+              </Link>
+            </p>
+          </section>
+        )}
 
         {/* 상세 설명 */}
         {info.description && (
