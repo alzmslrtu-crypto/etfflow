@@ -15,6 +15,7 @@ const NAV: NavGroup[] = [
       { href: '/#compare', label: 'ETF 비교' },
       { href: '/etf', label: 'ETF 모음' },
       { href: '/etf/screener', label: 'ETF 파인더 (전체)' },
+      { href: '/dividend-safety', label: '배당 삭감 이력·성장률' },
     ],
   },
   {

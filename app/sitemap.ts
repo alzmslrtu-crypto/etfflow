@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 import { blogPosts } from '@/lib/blog-posts'
-import { ETF_DIRECTORY } from '@/lib/etf-directory'
+import { COMPARE_PAIRS, ETF_DIRECTORY, pairSlug } from '@/lib/etf-directory'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.etfflow.kr'
@@ -133,7 +133,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }))
 
-  // 비교(/compare/[pair])·용어(/glossary/[slug]) 개별 페이지는 아직 고유 텍스트가 얇아
+  // 큐레이션한 비교 쌍은 두 종목의 실지급 배당 이력(성장률·삭감)을 대조해 보여주므로
+  // 쌍마다 고유 데이터가 있다 → 색인. 큐레이션 밖의 임의 조합은 페이지에서 noindex 처리.
+  const comparePages = COMPARE_PAIRS.map(([a, b]) => ({
+    url: `${baseUrl}/compare/${pairSlug(a, b)}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily' as const,
+    priority: 0.7,
+  }))
+
+  // 용어(/glossary/[slug]) 개별 페이지는 아직 고유 텍스트가 얇아
   // scaled content 감점을 피하려 noindex 유지 → 사이트맵에서도 제외한다.
-  return [...staticPages, ...blogPages, ...etfPages]
+  return [...staticPages, ...blogPages, ...etfPages, ...comparePages]
 }
