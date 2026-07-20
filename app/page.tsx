@@ -66,7 +66,7 @@ export default async function Page() {
               <Link
                 key={r.symbol}
                 href={`/etf/${encodeURIComponent(r.symbol)}`}
-                className="ledger-row grid-cols-[1fr_auto] sm:grid-cols-[1fr_7rem_6rem] border-b border-border last:border-0 hover:bg-secondary transition-colors group"
+                className="ledger-row grid-cols-[1fr_auto] sm:grid-cols-[1fr_9rem_5rem] border-b border-border last:border-0 hover:bg-secondary transition-colors group"
               >
                 <div className="min-w-0">
                   <div className="font-mono font-semibold text-foreground group-hover:text-primary transition-colors">
