@@ -58,7 +58,7 @@ export function Header() {
               </button>
               {/* 드롭다운 패널 (pt-2로 hover 끊김 방지) */}
               <div className="absolute left-0 top-full pt-2 hidden group-hover:block">
-                <div className="min-w-[200px] bg-card border border-border rounded-xl shadow-xl p-1.5">
+                <div className="min-w-[200px] bg-card border border-border   p-1.5">
                   {group.items.map((item) => (
                     <Link
                       key={item.href}

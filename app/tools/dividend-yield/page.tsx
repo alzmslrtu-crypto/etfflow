@@ -87,7 +87,7 @@ export default function DividendYieldPage() {
         />
 
         <div className="mt-10">
-          <Link href="/tools" className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all">
+          <Link href="/tools" className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-primary/30 transition-all">
             다른 계산기 보기
             <ArrowRight className="w-5 h-5" />
           </Link>

@@ -89,7 +89,7 @@ export default function DividendGoalPage() {
         <div className="mt-10">
           <Link
             href="/etf"
-            className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-primary/30 transition-all"
           >
             배당 ETF 종류 보러가기
             <ArrowRight className="w-5 h-5" />

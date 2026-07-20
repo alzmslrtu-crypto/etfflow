@@ -39,7 +39,7 @@ export function ExchangeCalculator() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+      <div className=" border border-border bg-card p-5 space-y-3">
         {/* 원화 */}
         <div>
           <label className="block text-sm font-medium text-foreground mb-1.5">원화 (KRW)</label>
@@ -49,7 +49,7 @@ export function ExchangeCalculator() {
               inputMode="numeric"
               value={Math.round(krw).toLocaleString()}
               onChange={(e) => onKrw(parseFloat(e.target.value.replace(/[^0-9]/g, "")) || 0)}
-              className="w-full h-12 px-4 pr-12 rounded-xl border border-border bg-background text-lg font-bold tabular-nums text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+              className="w-full h-12 px-4 pr-12 border border-border bg-background text-lg font-bold tabular-nums text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">₩</span>
           </div>
@@ -70,14 +70,14 @@ export function ExchangeCalculator() {
               inputMode="decimal"
               value={usd.toFixed(2)}
               onChange={(e) => onUsd(parseFloat(e.target.value.replace(/[^0-9.]/g, "")) || 0)}
-              className="w-full h-12 px-4 pr-12 rounded-xl border border-border bg-background text-lg font-bold tabular-nums text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+              className="w-full h-12 px-4 pr-12 border border-border bg-background text-lg font-bold tabular-nums text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
           </div>
         </div>
       </div>
 
-      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex items-center justify-between">
+      <div className=" border border-primary/20 bg-primary/5 p-4 flex items-center justify-between">
         <span className="text-sm text-muted-foreground">적용 환율</span>
         <span className="font-bold text-primary tabular-nums flex items-center gap-2">
           {loading && <Loader2 className="w-4 h-4 animate-spin" />}

@@ -36,7 +36,7 @@ function NumField({ label, value, onChange, suffix }: NumFieldProps) {
           inputMode="numeric"
           value={value.toLocaleString()}
           onChange={(e) => onChange(parseFloat(e.target.value.replace(/[^0-9.]/g, "")) || 0)}
-          className="w-full h-11 px-3 pr-10 rounded-xl border border-border bg-background font-semibold tabular-nums text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          className="w-full h-11 px-3 pr-10 border border-border bg-background font-semibold tabular-nums text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
         {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">{suffix}</span>}
       </div>
@@ -74,7 +74,7 @@ export function DripSimulator() {
   return (
     <div className="space-y-6">
       {/* 입력 */}
-      <div className="rounded-2xl border border-border bg-card p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className=" border border-border bg-card p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <NumField label="초기 투자금" value={initial} onChange={setInitial} suffix="원" />
         <NumField label="매월 추가 투자" value={monthly} onChange={setMonthly} suffix="원" />
         <div>
@@ -109,7 +109,7 @@ export function DripSimulator() {
       </div>
 
       {/* 차트 */}
-      <div className="rounded-2xl border border-border bg-card p-4">
+      <div className=" border border-border bg-card p-4">
         <div className="text-sm font-semibold text-foreground mb-4">자산 성장 추이 (배당 재투자)</div>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -146,7 +146,7 @@ export function DripSimulator() {
 
 function ResultCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`rounded-xl p-4 border ${accent ? "bg-primary/5 border-primary/20" : "bg-secondary/30 border-border"}`}>
+    <div className={` p-4 border ${accent ? "bg-primary/5 border-primary/20" : "bg-secondary/30 border-border"}`}>
       <div className="text-xs text-muted-foreground mb-1">{label}</div>
       <div className={`text-base sm:text-lg font-bold tabular-nums ${accent ? "text-primary" : "text-foreground"}`}>{value}</div>
     </div>

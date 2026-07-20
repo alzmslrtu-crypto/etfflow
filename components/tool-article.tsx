@@ -51,7 +51,7 @@ export function ToolArticle({
           <h2 className="text-2xl font-bold text-foreground mb-4">자주 묻는 질문</h2>
           <dl className="space-y-5">
             {faqs.map((f) => (
-              <div key={f.q} className="rounded-xl border border-border bg-card p-5">
+              <div key={f.q} className=" border border-border bg-card p-5">
                 <dt className="font-semibold text-foreground mb-2">Q. {f.q}</dt>
                 <dd className="text-[15px] leading-relaxed text-muted-foreground">{f.a}</dd>
               </div>

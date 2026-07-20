@@ -20,7 +20,7 @@ export function DividendYieldCalculator() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
+      <div className=" border border-border bg-card p-5 space-y-4">
         <Field label="현재 주가 (1주)" value={price} onChange={setPrice} suffix="원" />
         <Field label="1주당 연간 배당금" value={dividendPerShare} onChange={setDividendPerShare} suffix="원" />
         <Field label="보유(예정) 주수" value={shares} onChange={setShares} suffix="주" />
@@ -50,7 +50,7 @@ function Field({ label, value, onChange, suffix }: { label: string; value: numbe
           inputMode="numeric"
           value={value.toLocaleString()}
           onChange={(e) => onChange(parseFloat(e.target.value.replace(/[^0-9.]/g, "")) || 0)}
-          className="w-full h-11 px-3 pr-10 rounded-xl border border-border bg-background font-semibold tabular-nums text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          className="w-full h-11 px-3 pr-10 border border-border bg-background font-semibold tabular-nums text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">{suffix}</span>
       </div>
@@ -60,7 +60,7 @@ function Field({ label, value, onChange, suffix }: { label: string; value: numbe
 
 function Result({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`rounded-xl p-4 border ${accent ? "bg-primary/5 border-primary/20" : "bg-secondary/30 border-border"}`}>
+    <div className={` p-4 border ${accent ? "bg-primary/5 border-primary/20" : "bg-secondary/30 border-border"}`}>
       <div className="text-xs text-muted-foreground mb-1">{label}</div>
       <div className={`text-lg font-bold tabular-nums ${accent ? "text-primary" : "text-foreground"}`}>{value}</div>
     </div>

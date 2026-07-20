@@ -97,7 +97,7 @@ export function RiskProfileTest() {
   if (submitted) {
     return (
       <div className="space-y-6">
-        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 text-center">
+        <div className=" border border-primary/20 bg-primary/5 p-6 text-center">
           <div className="text-sm text-muted-foreground mb-1">당신의 투자 성향은</div>
           <div className="text-3xl font-bold text-primary mb-3">{result.type}</div>
           <p className="text-sm text-foreground/80 leading-relaxed mb-4">{result.desc}</p>
@@ -124,7 +124,7 @@ export function RiskProfileTest() {
           </button>
           <Link
             href="/#compare"
-            className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all"
+            className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-full bg-primary text-primary-foreground font-semibold primary/30 transition-all"
           >
             ETF 비교하기 <ArrowRight className="w-4 h-4" />
           </Link>
@@ -140,7 +140,7 @@ export function RiskProfileTest() {
   return (
     <div className="space-y-5">
       {QUESTIONS.map((question, qi) => (
-        <div key={qi} className="rounded-2xl border border-border bg-card p-5">
+        <div key={qi} className=" border border-border bg-card p-5">
           <div className="font-semibold text-foreground mb-3">
             <span className="text-primary">Q{qi + 1}.</span> {question.q}
           </div>
@@ -155,7 +155,7 @@ export function RiskProfileTest() {
                     next[qi] = opt.score
                     setAnswers(next)
                   }}
-                  className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition-colors ${
+                  className={`w-full text-left px-4 py-3 border text-sm transition-colors ${
                     selected ? "border-primary bg-primary/5 text-foreground font-medium" : "border-border bg-background text-muted-foreground hover:border-primary/40"
                   }`}
                 >
@@ -170,7 +170,7 @@ export function RiskProfileTest() {
       <button
         onClick={() => setSubmitted(true)}
         disabled={!allAnswered}
-        className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold primary/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {allAnswered ? "결과 보기" : `질문에 답해주세요 (${answers.filter((a) => a > 0).length}/${QUESTIONS.length})`}
       </button>

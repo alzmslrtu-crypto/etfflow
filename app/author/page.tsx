@@ -70,7 +70,7 @@ export default function AuthorPage() {
         </div>
 
         <div className="mt-10 flex flex-wrap gap-3">
-          <Link href="/blog" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-lg transition-all">
+          <Link href="/blog" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold transition-all">
             글 목록 보기
           </Link>
           <Link href="/about" className="inline-flex items-center gap-2 px-6 py-3 bg-card border border-border rounded-full font-semibold text-foreground hover:border-primary/50 transition-all">

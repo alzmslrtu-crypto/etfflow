@@ -17,7 +17,7 @@ export function TaxCalculator() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
+      <div className=" border border-border bg-card p-5 space-y-5">
         <div>
           <label className="block text-sm font-medium text-foreground mb-2">연간 배당금 (세전)</label>
           <div className="relative">
@@ -26,7 +26,7 @@ export function TaxCalculator() {
               inputMode="numeric"
               value={annualDividend.toLocaleString()}
               onChange={(e) => setAnnualDividend(parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0)}
-              className="w-full h-12 px-4 pr-10 rounded-xl border border-border bg-background text-lg font-bold tabular-nums text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+              className="w-full h-12 px-4 pr-10 border border-border bg-background text-lg font-bold tabular-nums text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">원</span>
           </div>
@@ -63,7 +63,7 @@ export function TaxCalculator() {
       </div>
 
       {/* 결과 */}
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <div className=" border border-border bg-card overflow-hidden">
         <div className="flex justify-between items-center p-4 border-b border-border">
           <span className="text-sm text-muted-foreground">세전 배당금</span>
           <span className="font-semibold text-foreground tabular-nums">{won(annualDividend)}</span>
@@ -79,7 +79,7 @@ export function TaxCalculator() {
       </div>
 
       {overThreshold && (
-        <div className="rounded-xl border border-stock-down/30 bg-stock-down/5 p-4">
+        <div className=" border border-stock-down/30 bg-stock-down/5 p-4">
           <p className="text-sm text-foreground leading-relaxed">
             <strong className="text-stock-down">⚠️ 금융소득종합과세 주의</strong><br />
             연 금융소득(이자+배당)이 2,000만원을 초과하면, 초과분이 다른 소득과 합산되어 누진세율로 종합과세될 수 있습니다.

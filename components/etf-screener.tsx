@@ -88,7 +88,7 @@ export function EtfScreener() {
   }
   if (error) {
     return (
-      <div className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
+      <div className=" border border-border bg-card p-6 text-center text-muted-foreground">
         ETF 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
       </div>
     )
@@ -103,11 +103,11 @@ export function EtfScreener() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="ETF 검색 (예: KODEX 200, 반도체, 미국배당)"
-          className="w-full h-11 pl-10 pr-4 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          className="w-full h-11 pl-10 pr-4 border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
       </div>
 
-      <div className="space-y-3 rounded-2xl border border-border bg-card p-4">
+      <div className="space-y-3 border border-border bg-card p-4">
         <div className="flex items-start gap-3">
           <span className="text-xs font-semibold text-muted-foreground w-12 flex-shrink-0 pt-1.5">분류</span>
           <div className="flex flex-wrap gap-1.5">
@@ -141,7 +141,7 @@ export function EtfScreener() {
             <Link
               key={e.symbol}
               href={`/etf/${encodeURIComponent(e.symbol)}`}
-              className="flex items-center gap-3 p-3 sm:p-4 bg-card rounded-xl border border-border hover:border-primary/50 hover:shadow-md transition-all"
+              className="flex items-center gap-3 p-3 sm:p-4 bg-card border border-border hover:border-primary/50 hover: transition-all"
             >
               <TickerLogo symbol={e.symbol} label={e.name} size={36} />
               <div className="min-w-0 flex-1">

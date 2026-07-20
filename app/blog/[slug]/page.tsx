@@ -186,7 +186,7 @@ function renderMarkdown(content: string, headings: { id: string; text: string }[
     // 본문에 '>' 기호가 그대로 노출되고 있었다.
     if (trimmed.startsWith('> ')) {
       elements.push(
-        <blockquote key={i} className="border-l-4 border-primary/40 bg-secondary/30 rounded-r-xl px-4 py-3 my-4 text-muted-foreground leading-relaxed">
+        <blockquote key={i} className="border-l-4 border-primary/40 bg-secondary/30 px-4 py-3 my-4 text-muted-foreground leading-relaxed">
           {parseInline(trimmed.slice(2))}
         </blockquote>
       )
@@ -317,7 +317,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             return (
               <>
                 {headings.length >= 3 && (
-                  <nav className="mb-8 rounded-2xl bg-secondary/30 p-5">
+                  <nav className="mb-8 bg-secondary/30 p-5">
                     <div className="text-sm font-bold text-foreground mb-3">목차</div>
                     <ul className="space-y-1.5">
                       {headings.map((h) => (
@@ -337,7 +337,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
           {/* 이 글을 쓴 사람 (E-E-A-T 신뢰 신호) */}
           <section className="mt-12 pt-8 border-t border-border">
-            <div className="rounded-2xl bg-secondary/30 p-5">
+            <div className=" bg-secondary/30 p-5">
               <div className="text-sm font-bold text-foreground mb-2">이 글을 쓴 사람</div>
               <Link href="/author" className="text-base font-semibold text-primary hover:underline">
                 {AUTHOR.name}
@@ -361,7 +361,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                   <Link
                     key={p.slug}
                     href={`/blog/${p.slug}`}
-                    className="block p-4 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                    className="block p-4 bg-card transition-all duration-300"
                   >
                     <div className="text-xs text-primary font-medium mb-1">{p.category}</div>
                     <div className="font-semibold text-foreground leading-snug mb-1 line-clamp-2">{p.title}</div>

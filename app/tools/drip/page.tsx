@@ -85,7 +85,7 @@ export default function DripPage() {
         <div className="mt-10">
           <Link
             href="/tools/dividend-goal"
-            className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-primary/30 transition-all"
           >
             월 배당금 목표 계산기도 써보기
             <ArrowRight className="w-5 h-5" />

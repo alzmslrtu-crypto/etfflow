@@ -116,7 +116,7 @@ export function EtfLiveStats({
 
   if (error || !data) {
     return (
-      <div className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
+      <div className=" border border-border bg-card p-6 text-center text-muted-foreground">
         실시간 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
       </div>
     )
@@ -162,7 +162,7 @@ export function EtfLiveStats({
         </div>
         <button
           onClick={addToCompare}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:shadow-lg hover:shadow-primary/30 transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm primary/30 transition-all"
         >
           {added ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           비교에 추가
@@ -172,7 +172,7 @@ export function EtfLiveStats({
       {/* 핵심 지표 그리드 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-xl border border-border bg-card p-3 sm:p-4">
+          <div key={s.label} className=" border border-border bg-card p-3 sm:p-4">
             <div className="text-xs text-muted-foreground mb-1">{s.label}</div>
             <div className={`text-base font-bold tabular-nums ${s.highlight ? "text-primary" : "text-foreground"}`}>
               {s.value}
@@ -183,7 +183,7 @@ export function EtfLiveStats({
 
       {/* 배당 지급월 */}
       {data.dividendPaymentMonths?.length > 0 && (
-        <div className="rounded-xl border border-border bg-card p-4">
+        <div className=" border border-border bg-card p-4">
           <div className="text-sm font-semibold text-foreground mb-3">배당 지급월</div>
           <div className="flex flex-wrap gap-1.5">
             {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => {
@@ -203,7 +203,7 @@ export function EtfLiveStats({
 
       {/* 연도별 배당금 차트 */}
       {yearlyDividends.length > 1 && (
-        <div className="rounded-xl border border-border bg-card p-4">
+        <div className=" border border-border bg-card p-4">
           <div className="text-sm font-semibold text-foreground mb-4">연도별 1주당 배당금 추이</div>
           <div className="h-[220px] w-full">
             <ResponsiveContainer width="100%" height="100%">

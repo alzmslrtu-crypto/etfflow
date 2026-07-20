@@ -107,11 +107,11 @@ export default async function RealReturnPage() {
         </p>
 
         {rows.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
+          <div className=" border border-border bg-card p-6 text-center text-muted-foreground">
             데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-border bg-card mb-4">
+          <div className="overflow-x-auto border border-border bg-card mb-4">
             <table className="w-full text-sm min-w-[640px]">
               <thead>
                 <tr className="border-b border-border text-muted-foreground">
@@ -235,7 +235,7 @@ export default async function RealReturnPage() {
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
             href="/tools/tax"
-            className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold primary/30 transition-all"
           >
             세후 실수령액도 계산하기
             <ArrowRight className="w-5 h-5" />

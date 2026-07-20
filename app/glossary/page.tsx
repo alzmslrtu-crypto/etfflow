@@ -38,7 +38,7 @@ export default function GlossaryIndexPage() {
                     <Link
                       key={t.slug}
                       href={`/glossary/${t.slug}`}
-                      className="block p-4 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                      className="block p-4 bg-card transition-all duration-300"
                     >
                       <div className="font-semibold text-foreground mb-1">{t.term}</div>
                       <div className="text-sm text-muted-foreground line-clamp-2">{t.short}</div>

@@ -45,11 +45,11 @@ export default async function DividendSafetyPage() {
         </p>
 
         {rated.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
+          <div className=" border border-border bg-card p-6 text-center text-muted-foreground">
             데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-border bg-card mb-4">
+          <div className="overflow-x-auto border border-border bg-card mb-4">
             <table className="w-full text-sm min-w-[680px]">
               <thead>
                 <tr className="border-b border-border text-muted-foreground">
@@ -115,7 +115,7 @@ export default async function DividendSafetyPage() {
         </p>
 
         {pending.length > 0 && (
-          <div className="rounded-2xl border border-border bg-secondary/30 p-5 mb-10">
+          <div className=" border border-border bg-secondary/30 p-5 mb-10">
             <h2 className="text-sm font-bold text-foreground mb-2">평가 보류 — 배당 이력이 짧은 종목</h2>
             <p className="text-sm text-muted-foreground leading-relaxed mb-3">
               배당을 지급한 완전한 연도가 3개 미만이라 성장률·삭감 여부를 판단하지 않았습니다.

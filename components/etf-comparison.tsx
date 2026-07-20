@@ -72,7 +72,7 @@ function formatAssets(
 function CustomTooltip({ active, payload, label, type }: any) {
   if (!active || !payload || !payload.length) return null
   return (
-    <div className="bg-card border border-border rounded-lg shadow-lg px-3 py-2 text-xs">
+    <div className="bg-card border border-border px-3 py-2 text-xs">
       <p className="text-muted-foreground mb-1.5 font-medium">{label}</p>
       {payload.map((entry: any) => (
         <div key={entry.name} className="flex items-center gap-2 py-0.5">
@@ -571,7 +571,7 @@ export function ETFComparison() {
               적용 환율 1달러 = ₩{Math.round(exchangeRate).toLocaleString()}
             </span>
             {/* Currency Toggle */}
-            <div className="flex items-center gap-1 bg-secondary rounded-lg p-1">
+            <div className="flex items-center gap-1 bg-secondary p-1">
               <Button
                 variant={displayCurrency === "KRW" ? "default" : "ghost"}
                 size="sm"
@@ -595,9 +595,9 @@ export function ETFComparison() {
         {/* Search & Selected Section */}
         <div className="mb-6">
           <div className="mb-3">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 block">종목 추가</label>
-            <div className="relative" ref={searchContainerRef}>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <label className="eyebrow mb-2 block">비교에 종목 추가</label>
+            <div className="relative border-b border-foreground focus-within:border-primary transition-colors" ref={searchContainerRef}>
+              <Search className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground" />
               <Input
                 type="text"
                 value={searchQuery}
@@ -608,7 +608,7 @@ export function ETFComparison() {
                 onFocus={() => setIsSearchOpen(true)}
                 onKeyDown={handleSearchKeyDown}
                 placeholder="종목명·티커 검색 (예: 삼성전자, SCHD, TIGER 미국배당)"
-                className="pl-10 h-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
+                className="pl-7 h-11 bg-transparent border-0 rounded-none shadow-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground"
                 disabled={symbols.length >= 5}
               />
               {symbols.length >= 5 && (
@@ -619,7 +619,7 @@ export function ETFComparison() {
 
               {/* Search Dropdown */}
               {isSearchOpen && symbols.length < 5 && (
-                <div className="absolute z-50 w-full mt-2 bg-card border border-border rounded-xl shadow-xl max-h-[340px] overflow-y-auto">
+                <div className="absolute z-50 w-full mt-2 bg-card border border-border max-h-[340px] overflow-y-auto">
                   {/* 검색어가 없을 때: 인기 종목 헤더 */}
                   {searchQuery.length === 0 && (
                     <div className="px-4 py-2 text-xs font-semibold text-muted-foreground bg-secondary/30 border-b border-border">
@@ -692,7 +692,7 @@ export function ETFComparison() {
                   return (
                     <div
                       key={symbol}
-                      className="flex items-start gap-2.5 px-3 py-2.5 rounded-xl border border-border bg-card hover:border-primary/50 transition-colors min-w-0"
+                      className="flex items-start gap-2.5 px-3 py-2.5 border border-border bg-card hover:border-primary/50 transition-colors min-w-0"
                     >
                       <TickerLogo symbol={symbol} label={data?.name} size={28} fallbackColor={COLORS[index]} />
                       <div className="min-w-0 flex-1">
@@ -739,7 +739,7 @@ export function ETFComparison() {
           <CardContent className="p-3 sm:p-6">
             {/* Chart Controls */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 pb-4 border-b border-border">
-              <div className="flex items-center gap-2 bg-secondary/50 rounded-lg p-1">
+              <div className="flex items-center gap-2 bg-secondary/50 p-1">
                 <Button
                   variant={chartType === "returns" ? "default" : "ghost"}
                   size="sm"
@@ -759,7 +759,7 @@ export function ETFComparison() {
               </div>
               
               {chartType === "returns" && (
-                <div className="flex flex-wrap items-center gap-1 bg-secondary/50 rounded-lg p-1">
+                <div className="flex flex-wrap items-center gap-1 bg-secondary/50 p-1">
                   {PERIODS.map((p) => (
                     <Button
                       key={p}
@@ -775,7 +775,7 @@ export function ETFComparison() {
                 </div>
               )}
               {chartType === "dividends" && (
-                <div className="flex items-center gap-1 bg-secondary/50 rounded-lg p-1">
+                <div className="flex items-center gap-1 bg-secondary/50 p-1">
                   <Button
                     variant={dividendChartType === "yearly" ? "default" : "ghost"}
                     size="sm"
@@ -917,7 +917,7 @@ export function ETFComparison() {
                   return (
                     <div
                       key={symbol}
-                      className="rounded-xl p-4 border-2 bg-card"
+                      className="p-4 border border-border bg-card"
                       style={{ borderColor: COLORS[index] + "40" }}
                     >
                       <div className="flex items-center justify-between mb-3 pb-3 border-b border-border">
@@ -1105,7 +1105,7 @@ export function ETFComparison() {
                 <p className="text-xs text-muted-foreground hidden sm:block">종목별 투자금액을 입력하면 월별 예상 배당금이 실시간으로 반영됩니다</p>
               </div>
               {/* 세전/세후 토글 */}
-              <div className="flex items-center gap-1 bg-secondary/50 rounded-lg p-1 flex-shrink-0">
+              <div className="flex items-center gap-1 bg-secondary/50 p-1 flex-shrink-0">
                 <Button
                   variant={!afterTax ? "default" : "ghost"}
                   size="sm"
@@ -1156,7 +1156,7 @@ export function ETFComparison() {
                     {items.map((it) => (
                       <div
                         key={it.label}
-                        className={`rounded-xl p-3 sm:p-4 border ${it.accent ? "bg-primary/5 border-primary/20" : "bg-secondary/30 border-border"}`}
+                        className={`p-3 sm:p-4 border ${it.accent ? "bg-primary/5 border-primary/20" : "bg-secondary/30 border-border"}`}
                       >
                         <div className="text-[11px] sm:text-xs text-muted-foreground mb-1">{it.label}</div>
                         <div className={`text-base sm:text-xl font-bold tabular-nums truncate ${it.accent ? "text-primary" : "text-foreground"}`}>
@@ -1188,7 +1188,7 @@ export function ETFComparison() {
                   return (
                     <div
                       key={symbol}
-                      className="rounded-xl bg-card border border-border p-3.5"
+                      className="bg-card border border-border p-3.5"
                     >
                       {/* Header + 수량 조절 (한 줄) */}
                       <div className="flex items-center justify-between gap-2">
@@ -1207,7 +1207,7 @@ export function ETFComparison() {
                           <button
                             onClick={() => updateShares(shares - 1)}
                             disabled={shares <= 0}
-                            className="w-7 h-7 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            className="w-7 h-7 bg-muted/50 hover:bg-muted flex items-center justify-center text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
@@ -1224,7 +1224,7 @@ export function ETFComparison() {
                           />
                           <button
                             onClick={() => updateShares(shares + 1)}
-                            className="w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center text-primary transition-colors"
+                            className="w-7 h-7 bg-primary/10 hover:bg-primary/20 flex items-center justify-center text-primary transition-colors"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -1266,7 +1266,7 @@ export function ETFComparison() {
               </div>
 
               {/* Monthly Dividend Section - Only months with dividends */}
-              <div className="rounded-2xl bg-card border border-border p-5">
+              <div className="bg-card border border-border p-5">
                 <div className="text-base font-semibold text-foreground mb-5">배당금은 이렇게 들어와요</div>
                 {(() => {
                   const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
@@ -1344,7 +1344,7 @@ export function ETFComparison() {
                       {monthsWithDividend.map((d) => (
                         <div key={d.month} className="flex items-center gap-4">
                           <div className="w-12 text-sm font-medium text-muted-foreground">{d.month}</div>
-                          <div className="flex-1 h-3 bg-muted/30 rounded-full overflow-hidden flex">
+                          <div className="flex-1 h-3 bg-muted/40 overflow-hidden flex">
                             {symbols.map((symbol) => {
                               const v = d.bySymbol[symbol] || 0
                               if (v <= 0) return null

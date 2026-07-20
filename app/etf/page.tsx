@@ -54,7 +54,7 @@ function EtfCard({ etf, live }: { etf: EtfInfo; live?: EtfSummary }) {
   return (
     <Link
       href={`/etf/${encodeURIComponent(etf.symbol)}`}
-      className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+      className="flex items-center gap-3 p-4 bg-card transition-all duration-300"
     >
       <TickerLogo symbol={etf.symbol} label={etf.name} size={40} />
       <div className="min-w-0 flex-1">
@@ -122,7 +122,7 @@ export default async function EtfIndexPage() {
         <div className="mt-12">
           <Link
             href="/#compare"
-            className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-primary/30 transition-all"
           >
             여러 ETF 한눈에 비교하기
             <ArrowRight className="w-5 h-5" />

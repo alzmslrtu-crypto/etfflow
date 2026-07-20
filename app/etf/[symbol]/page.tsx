@@ -109,7 +109,7 @@ export default async function EtfDetailPage({
         {/* 비교 CTA */}
         <Link
           href="/#compare"
-          className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all mb-12"
+          className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-primary/30 transition-all mb-12"
         >
           다른 ETF와 비교하기
           <ArrowRight className="w-5 h-5" />
@@ -124,7 +124,7 @@ export default async function EtfDetailPage({
                 <Link
                   key={e.symbol}
                   href={`/etf/${encodeURIComponent(e.symbol)}`}
-                  className="flex items-center gap-3 p-4 rounded-2xl shadow-sm bg-card hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                  className="flex items-center gap-3 p-4 bg-card transition-all duration-300"
                 >
                   <TickerLogo symbol={e.symbol} label={e.name} size={36} />
                   <div className="min-w-0">

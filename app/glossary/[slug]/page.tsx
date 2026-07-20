@@ -67,13 +67,13 @@ export default async function GlossaryTermPage({
         <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">{term.term}</h1>
         <p className="text-lg text-foreground/90 mb-6">{term.short}</p>
 
-        <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 mb-10">
+        <div className=" border border-border bg-card p-5 sm:p-6 mb-10">
           <p className="text-sm sm:text-base text-foreground/80 leading-relaxed">{term.description}</p>
         </div>
 
         <Link
           href="/#compare"
-          className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all mb-12"
+          className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover: primary/30 transition-all mb-12"
         >
           배당 ETF 비교하러 가기
           <ArrowRight className="w-5 h-5" />
@@ -87,7 +87,7 @@ export default async function GlossaryTermPage({
                 <Link
                   key={t.slug}
                   href={`/glossary/${t.slug}`}
-                  className="block p-4 bg-card rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                  className="block p-4 bg-card   hover:  transition-all duration-300"
                 >
                   <div className="font-semibold text-foreground mb-0.5">{t.term}</div>
                   <div className="text-xs text-muted-foreground line-clamp-1">{t.short}</div>

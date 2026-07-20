@@ -85,7 +85,7 @@ export default async function ComparePage({
             <Link
               key={etf.symbol}
               href={`/etf/${encodeURIComponent(etf.symbol)}`}
-              className="flex items-center gap-3 p-4 rounded-2xl border border-border bg-card hover:border-primary/50 transition-all"
+              className="flex items-center gap-3 p-4  border border-border bg-card hover:border-primary/50 transition-all"
             >
               <TickerLogo symbol={etf.symbol} label={etf.name} size={40} />
               <div className="min-w-0">
@@ -117,14 +117,14 @@ export default async function ComparePage({
         {/* CTA */}
         <Link
           href="/#compare"
-          className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all mb-10"
+          className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold hover: primary/30 transition-all mb-10"
         >
           비교 도구에서 직접 담아보기
           <ArrowRight className="w-5 h-5" />
         </Link>
 
         {/* 면책 */}
-        <div className="rounded-xl bg-muted/30 p-4 text-xs text-muted-foreground leading-relaxed">
+        <div className=" bg-muted/30 p-4 text-xs text-muted-foreground leading-relaxed">
           본 페이지는 정보 제공 목적이며 투자 권유가 아닙니다. 데이터는 Yahoo Finance·네이버 금융 기준으로 지연되거나 실제와 차이가 있을 수 있습니다.
         </div>
       </div>
