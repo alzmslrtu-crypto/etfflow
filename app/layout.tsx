@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
 import { Header } from '@/components/header'
@@ -7,10 +6,6 @@ import { Footer } from '@/components/footer'
 import { FAQ_ITEMS } from '@/lib/faq'
 import './globals.css'
 
-const inter = Inter({ 
-  subsets: ["latin"],
-  variable: '--font-inter',
-});
 
 export const metadata: Metadata = {
   // 기본 SEO
@@ -95,8 +90,13 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="ko" className={`bg-background ${inter.variable}`}>
+    <html lang="ko" className="bg-background">
       <head>
+        {/* Pretendard — 한국 핀테크 표준 서체. 한글·영문·숫자 균형이 좋다. */}
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

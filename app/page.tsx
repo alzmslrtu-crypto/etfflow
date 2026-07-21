@@ -6,6 +6,7 @@ import { ETF_DIRECTORY, resolveEtfInfo } from "@/lib/etf-directory"
 import { FAQ_ITEMS } from "@/lib/faq"
 import { getEtfSummaries } from "@/lib/etf-quote"
 import { getDividendSafetyBatch } from "@/lib/dividend-safety"
+import { TickerSearch } from "@/components/ticker-search"
 
 // 시세 데이터를 1시간마다 갱신 (ISR)
 export const revalidate = 3600
@@ -25,20 +26,33 @@ export default async function Page() {
     .sort((a, b) => (b.cagr ?? -999) - (a.cagr ?? -999))
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
-      {/* Hero Section - Toss Style */}
-      <div className="pt-10 pb-6 sm:pt-14 sm:pb-8 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-4 inline-block px-3 py-1.5 bg-primary/10 rounded-full">
-            <span className="text-sm font-semibold text-primary">ETF Flow</span>
+    <main className="min-h-screen bg-background">
+      {/* Hero — 검색을 중심에 둔 프리미엄 핀테크 레이아웃 */}
+      <div className="relative overflow-hidden border-b border-border">
+        {/* 은은한 인디고 방사형 배경 */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.55]"
+          style={{
+            background:
+              "radial-gradient(60rem 30rem at 50% -8rem, color-mix(in srgb, var(--primary) 14%, transparent), transparent)",
+          }}
+        />
+        <div className="relative max-w-3xl mx-auto px-4 pt-16 pb-14 sm:pt-24 sm:pb-20 text-center">
+          <div className="mb-6 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent text-accent-foreground text-sm font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-stock-up" />
+            실시간 배당 데이터 · 국내외 {ETF_DIRECTORY.length}개 종목
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight tracking-tight">
-            배당 ETF <span className="text-primary">쉽게 비교</span>하고<br />
-            수익을 계산해보세요
+          <h1 className="text-4xl sm:text-6xl font-bold text-foreground mb-5 leading-[1.1] tracking-[-0.035em]">
+            배당금이 얼마나,<br />
+            <span className="text-primary">언제, 계속</span> 들어오는지
           </h1>
-          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-            국내·미국 ETF 수익률을 실시간으로 비교하는 ETF 비교 사이트. SCHD, JEPI, VOO 등 인기 ETF를 한눈에 비교하고 예상 배당금을 정확하게 계산합니다.
+          <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl mx-auto">
+            종목만 검색하면 배당 성장률·삭감 이력·세후 수령액까지.
+            국내·미국 ETF와 배당주를 실제 지급 기록으로 확인하세요.
           </p>
+          <div className="max-w-xl mx-auto text-left">
+            <TickerSearch />
+          </div>
         </div>
       </div>
 
