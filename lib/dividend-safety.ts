@@ -31,6 +31,21 @@ export type DividendSafety = {
 
 const round = (n: number) => Math.round(n * 100) / 100
 
+/** 최빈값. 동률이면 더 큰 값(정상 지급 횟수는 보통 최대치라 경계로 빠진 해를 배제). */
+function mode(nums: number[]): number {
+  const freq = new Map<number, number>()
+  for (const n of nums) freq.set(n, (freq.get(n) ?? 0) + 1)
+  let best = nums[0]
+  let bestFreq = 0
+  for (const [n, f] of freq) {
+    if (f > bestFreq || (f === bestFreq && n > best)) {
+      best = n
+      bestFreq = f
+    }
+  }
+  return best
+}
+
 /**
  * 한 종목의 배당 지속성 지표. 데이터가 모자라면 sufficient=false로 돌려주고
  * 호출부가 "평가 보류"로 표시한다. 억지로 점수를 매기지 않는다.
@@ -66,14 +81,36 @@ export async function getDividendSafety(symbol: string): Promise<DividendSafety 
   const empty = { symbol, years: [], cagr: null, cutCount: 0, worstCut: 0, priceReturn: 0, dividendReturn: 0, totalReturn: 0, from, to, sufficient: false }
   if (to < from) return empty
 
-  // 연도별 배당 합계
+  // 연도별 배당 합계와 지급 횟수
   const byYear = new Map<number, number>()
-  for (let y = from; y <= to; y++) byYear.set(y, 0)
+  const countByYear = new Map<number, number>()
+  for (let y = from; y <= to; y++) {
+    byYear.set(y, 0)
+    countByYear.set(y, 0)
+  }
   for (const d of dividends) {
     const y = new Date(d.date).getFullYear()
-    if (y >= from && y <= to) byYear.set(y, (byYear.get(y) ?? 0) + (d.amount ?? 0))
+    if (y >= from && y <= to) {
+      byYear.set(y, (byYear.get(y) ?? 0) + (d.amount ?? 0))
+      countByYear.set(y, (countByYear.get(y) ?? 0) + 1)
+    }
   }
-  const all = [...byYear.entries()].map(([year, total]) => ({ year, total: round(total) }))
+
+  // 지급 횟수 정규화(연환산). 월배당 종목은 배당락일이 연말·연초 경계를 넘나들며
+  // 한 해에 11번, 다음 해에 13번 잡힌다. 그대로 합산하면 매달 배당을 올린
+  // 종목(리얼티인컴 등)이 삭감으로 오판정된다. 회당 평균 × 표준 지급횟수로
+  // 연환산해 이 경계 왜곡을 없앤다. 표준 횟수는 관측된 최빈 횟수를 쓴다.
+  const counts = [...countByYear.values()].filter((c) => c > 0)
+  const standardCount = counts.length ? mode(counts) : 0
+  const all = [...byYear.entries()].map(([year, total]) => {
+    const count = countByYear.get(year) ?? 0
+    // 정상 횟수만큼 지급된 해는 그대로, 경계로 어긋난 해만 회당 평균으로 보정한다.
+    const annualized =
+      count > 0 && standardCount > 0 && count !== standardCount
+        ? (total / count) * standardCount
+        : total
+    return { year, total: round(annualized) }
+  })
 
   // 배당을 시작하기 전 연도는 잘라낸다. 안 자르면 "0, 0, 0, 270"이 삭감 0회로 잡혀
   // 최근에 배당을 시작한 ETF가 오래 안정적으로 준 ETF처럼 보인다.

@@ -32,3 +32,10 @@ console.log('\n불변식 통과')
 const late = await getDividendSafety('379800.KS')
 assert(late && !late.sufficient, '379800.KS: 배당 시작 1년차인데 평가 대상이 됨')
 console.log('379800.KS 재확인 → 평가보류 (지급연도', late.years.length, '개)')
+
+// 월배당 경계 왜곡 보정 — 지급 횟수가 흔들려도 삭감으로 오판정하지 않는다
+for (const [sym, expectCut] of [['O', 0], ['SCHD', 0], ['T', 2], ['STAG', 0]] as [string, number][]) {
+  const r = await getDividendSafety(sym)
+  if (r?.sufficient) assert(r.cutCount === expectCut, `${sym}: 삭감 ${r.cutCount}회, 기대 ${expectCut}회`)
+}
+console.log('연환산 보정 통과 (O 월배당 삭감 오판정 회귀 방지)')
