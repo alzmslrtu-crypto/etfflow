@@ -70,39 +70,48 @@ export default async function EtfDetailPage({
   const safety = await getDividendSafety(info.symbol)
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
-      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-          <Link href="/" className="hover:text-primary transition-colors">홈</Link>
-          <span>/</span>
-          <Link href="/#compare" className="hover:text-primary transition-colors">ETF 비교</Link>
-          <span>/</span>
-          <span className="text-foreground font-medium">{info.symbol.replace(/\.(KS|KQ)$/, "")}</span>
-        </nav>
+    <main className="min-h-screen bg-background">
+      {/* Header — 인디고 히어로 */}
+      <div className="relative overflow-hidden border-b border-border">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-60"
+          style={{
+            background:
+              "radial-gradient(50rem 24rem at 20% -6rem, color-mix(in srgb, var(--primary) 12%, transparent), transparent)",
+          }}
+        />
+        <div className="relative max-w-4xl mx-auto px-4 pt-6 pb-8 sm:pt-8 sm:pb-10">
+          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+            <Link href="/" className="hover:text-primary transition-colors">홈</Link>
+            <span>/</span>
+            <Link href="/#compare" className="hover:text-primary transition-colors">ETF 비교</Link>
+            <span>/</span>
+            <span className="text-foreground font-medium">{info.symbol.replace(/\.(KS|KQ)$/, "")}</span>
+          </nav>
 
-        {/* Header */}
-        <div className="flex items-start gap-4 mb-6">
-          <TickerLogo symbol={info.symbol} label={info.name} size={56} />
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2 mb-1">
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{info.name}</h1>
-              <span
-                className={`text-xs font-medium px-2 py-0.5 rounded ${isKR ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
-              >
-                {isKR ? "🇰🇷 한국 상장" : "🇺🇸 미국 상장"}
-              </span>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {info.symbol.replace(/\.(KS|KQ)$/, "")} · {info.category}
-              {info.issuer !== "-" && ` · ${info.issuer}`}
+          <div className="flex items-start gap-4">
+            <TickerLogo symbol={info.symbol} label={info.name} size={56} />
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">{info.name}</h1>
+                <span
+                  className={`text-xs font-semibold px-2.5 py-1 rounded-full ${isKR ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}`}
+                >
+                  {isKR ? "한국 상장" : "미국 상장"}
+                </span>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {info.symbol.replace(/\.(KS|KQ)$/, "")} · {info.category}
+                {info.issuer !== "-" && ` · ${info.issuer}`}
+              </div>
             </div>
           </div>
+
+          <p className="text-base text-foreground/80 leading-relaxed mt-5 max-w-2xl">{info.summary}</p>
         </div>
+      </div>
 
-        {/* 요약 */}
-        <p className="text-base text-foreground/90 leading-relaxed mb-8">{info.summary}</p>
-
+      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-10">
         {/* 실시간 지표 */}
         <section className="mb-10">
           <h2 className="text-lg font-bold text-foreground mb-4">실시간 시세 · 배당 정보</h2>

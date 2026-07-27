@@ -81,7 +81,7 @@ export default async function EtfIndexPage() {
   const live = await getEtfSummaries(ETF_DIRECTORY.map((e) => e.symbol))
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
+    <main className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 py-10 sm:py-16">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
           <Link href="/" className="hover:text-primary transition-colors">홈</Link>

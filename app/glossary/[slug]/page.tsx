@@ -50,7 +50,7 @@ export default async function GlossaryTermPage({
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
+    <main className="min-h-screen bg-background">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="max-w-3xl mx-auto px-4 py-10 sm:py-16">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
