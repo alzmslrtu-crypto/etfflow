@@ -4,6 +4,7 @@ import { ArrowLeft, Calendar, Clock, User } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { AUTHOR } from '@/lib/author'
+import { AdFit } from '@/components/adfit'
 
 // Generate static params for all blog posts
 export function generateStaticParams() {
@@ -334,6 +335,8 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               </>
             )
           })()}
+
+          <AdFit unit="DAN-IM4sogG3w0fKW7oM" width={728} height={90} className="my-10" />
 
           {/* 이 글을 쓴 사람 (E-E-A-T 신뢰 신호) */}
           <section className="mt-12 pt-8 border-t border-border">
