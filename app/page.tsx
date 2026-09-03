@@ -57,11 +57,6 @@ export default async function Page() {
         </div>
       </div>
 
-      {/* 히어로와 비교 도구 사이 광고 (PC 전용) */}
-      <div className="max-w-6xl mx-auto px-4">
-        <AdFit unit="DAN-iD54RiHVYbJNWsS9" width={728} height={90} className="hidden md:flex py-8" />
-      </div>
-
       {/* ETF Comparison Tool */}
       <div id="compare" className="max-w-6xl mx-auto px-4 pb-12 sm:pb-16">
         <ETFComparison />
@@ -71,6 +66,11 @@ export default async function Page() {
           <Link href="/tools/tax" className="text-primary hover:underline">배당소득세 계산기</Link>에서 확인하세요.
           모든 정보는 투자 권유가 아닙니다.
         </p>
+      </div>
+
+      {/* ETF 비교 아래 광고 (PC 전용) */}
+      <div className="max-w-6xl mx-auto px-4">
+        <AdFit unit="DAN-iD54RiHVYbJNWsS9" width={728} height={90} className="hidden md:flex pb-12" />
       </div>
 
       {/* 배당 지속성 — 자기소개 대신 실제 지급 이력을 보여준다 */}
