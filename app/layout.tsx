@@ -109,8 +109,8 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <Header />
-        <AdFitBanner className="mt-4 mb-2" />
         {children}
+        <AdFitBanner className="mt-4 mb-8" />
         <Footer />
         {process.env.NODE_ENV === 'production' && <Analytics />}
         <Script
