@@ -312,6 +312,8 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </div>
           </header>
 
+          <AdFit unit="DAN-iD54RiHVYbJNWsS9" width={728} height={90} className="mb-8" />
+
           {(() => {
             const headings: { id: string; text: string }[] = []
             const body = renderMarkdown(post.content, headings)
@@ -336,7 +338,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             )
           })()}
 
-          <AdFit unit="DAN-IM4sogG3w0fKW7oM" width={728} height={90} className="my-10" />
+          <AdFit unit="DAN-QfcP89TpBlzpdnyD" width={728} height={90} className="my-10" />
 
           {/* 이 글을 쓴 사람 (E-E-A-T 신뢰 신호) */}
           <section className="mt-12 pt-8 border-t border-border">
