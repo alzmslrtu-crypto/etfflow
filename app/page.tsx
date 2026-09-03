@@ -7,6 +7,7 @@ import { FAQ_ITEMS } from "@/lib/faq"
 import { getEtfSummaries } from "@/lib/etf-quote"
 import { getDividendSafetyBatch } from "@/lib/dividend-safety"
 import { TickerSearch } from "@/components/ticker-search"
+import { AdFit } from "@/components/adfit"
 
 // 시세 데이터를 1시간마다 갱신 (ISR)
 export const revalidate = 3600
@@ -54,6 +55,11 @@ export default async function Page() {
             <TickerSearch />
           </div>
         </div>
+      </div>
+
+      {/* 히어로와 비교 도구 사이 광고 (PC 전용) */}
+      <div className="max-w-6xl mx-auto px-4">
+        <AdFit unit="DAN-iD54RiHVYbJNWsS9" width={728} height={90} className="hidden md:flex py-8" />
       </div>
 
       {/* ETF Comparison Tool */}
