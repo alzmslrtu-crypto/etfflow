@@ -312,7 +312,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </div>
           </header>
 
-          <AdFit unit="DAN-iD54RiHVYbJNWsS9" width={728} height={90} className="mb-8" />
+          <AdFit unit="DAN-iD54RiHVYbJNWsS9" width={728} height={90} className="hidden md:flex mb-8" />
 
           {(() => {
             const headings: { id: string; text: string }[] = []

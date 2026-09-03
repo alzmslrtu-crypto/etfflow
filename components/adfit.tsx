@@ -4,10 +4,14 @@ import { useEffect, useRef } from 'react'
 
 const SDK_SRC = '//t1.kakaocdn.net/kas/static/ba.min.js'
 
+const PC_UNIT = 'DAN-QfcP89TpBlzpdnyD'
+const MOBILE_UNIT = 'DAN-uKEFr9Y1crR1Q96f'
+
 interface AdFitProps {
   unit: string
   width: number
   height: number
+  /** display 유틸리티(flex/hidden 등)를 여기서 지정한다. */
   className?: string
 }
 
@@ -38,7 +42,7 @@ export function AdFit({ unit, width, height, className }: AdFitProps) {
   return (
     <div
       ref={ref}
-      className={`flex justify-center overflow-hidden ${className ?? ''}`}
+      className={`justify-center overflow-hidden ${className ?? ''}`}
       style={{ minHeight: height }}
     >
       <ins
@@ -49,5 +53,18 @@ export function AdFit({ unit, width, height, className }: AdFitProps) {
         data-ad-height={String(height)}
       />
     </div>
+  )
+}
+
+/**
+ * 반응형 배너. PC(768px 이상)는 728x90, 모바일은 320x100.
+ * 숨긴 쪽은 부모가 display:none이라 SDK가 건너뛰므로 광고 요청도 나가지 않는다.
+ */
+export function AdFitBanner({ className }: { className?: string }) {
+  return (
+    <>
+      <AdFit unit={PC_UNIT} width={728} height={90} className={`hidden md:flex ${className ?? ''}`} />
+      <AdFit unit={MOBILE_UNIT} width={320} height={100} className={`flex md:hidden ${className ?? ''}`} />
+    </>
   )
 }
