@@ -338,8 +338,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             )
           })()}
 
-          <AdFit unit="DAN-QfcP89TpBlzpdnyD" width={728} height={90} className="my-10" />
-
           {/* 이 글을 쓴 사람 (E-E-A-T 신뢰 신호) */}
           <section className="mt-12 pt-8 border-t border-border">
             <div className="rounded-2xl bg-secondary/30 p-5">
