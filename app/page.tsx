@@ -7,7 +7,7 @@ import { FAQ_ITEMS } from "@/lib/faq"
 import { getEtfSummaries } from "@/lib/etf-quote"
 import { getDividendSafetyBatch } from "@/lib/dividend-safety"
 import { TickerSearch } from "@/components/ticker-search"
-import { AdFit } from "@/components/adfit"
+import { AdFit, AdFitBanner } from "@/components/adfit"
 
 // 시세 데이터를 1시간마다 갱신 (ISR)
 export const revalidate = 3600
@@ -177,6 +177,11 @@ export default async function Page() {
             })}
           </div>
         </div>
+      </div>
+
+      {/* 가이드 섹션 위 광고 */}
+      <div className="max-w-6xl mx-auto px-4">
+        <AdFitBanner className="pb-12" />
       </div>
 
       {/* Blog Section */}
