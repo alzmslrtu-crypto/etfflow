@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 
 const SDK_SRC = '//t1.kakaocdn.net/kas/static/ba.min.js'
 
@@ -67,4 +68,15 @@ export function AdFitBanner({ className }: { className?: string }) {
       <AdFit unit={MOBILE_UNIT} width={320} height={100} className={`flex md:hidden ${className ?? ''}`} />
     </>
   )
+}
+
+/**
+ * 푸터 위 전역 배너.
+ * 홈은 가이드 섹션 위에 같은 단위를 쓰므로 여기서는 렌더하지 않는다.
+ * (애드핏은 한 페이지에 같은 광고단위를 두 번 넣으면 하나만 노출한다.)
+ */
+export function GlobalAdFitBanner({ className }: { className?: string }) {
+  const pathname = usePathname()
+  if (pathname === '/') return null
+  return <AdFitBanner className={className} />
 }

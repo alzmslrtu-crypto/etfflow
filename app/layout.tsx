@@ -3,7 +3,7 @@ import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { AdFitBanner } from '@/components/adfit'
+import { GlobalAdFitBanner } from '@/components/adfit'
 import { FAQ_ITEMS } from '@/lib/faq'
 import './globals.css'
 
@@ -110,7 +110,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <Header />
         {children}
-        <AdFitBanner className="mt-4 mb-8" />
+        <GlobalAdFitBanner className="mt-4 mb-8" />
         <Footer />
         {process.env.NODE_ENV === 'production' && <Analytics />}
         <Script
