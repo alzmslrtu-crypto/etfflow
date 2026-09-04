@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 
 const SDK_SRC = '//t1.kakaocdn.net/kas/static/ba.min.js'
@@ -74,9 +74,16 @@ export function AdFitBanner({ className }: { className?: string }) {
  * 푸터 위 전역 배너.
  * 홈은 가이드 섹션 위에 같은 단위를 쓰므로 여기서는 렌더하지 않는다.
  * (애드핏은 한 페이지에 같은 광고단위를 두 번 넣으면 하나만 노출한다.)
+ * 홈이 정적 생성이라 서버 렌더 시점에는 경로를 알 수 없어, 마운트 후에 판단한다.
  */
 export function GlobalAdFitBanner({ className }: { className?: string }) {
   const pathname = usePathname()
-  if (pathname === '/') return null
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted || pathname === '/') return null
   return <AdFitBanner className={className} />
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
-import Script from 'next/script'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { GlobalAdFitBanner } from '@/components/adfit'
@@ -106,6 +105,12 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
         />
+        {/* 애드센스 로더 — 구글 안내대로 head에 둔다(심사 시 코드 확인 대상) */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2046210707085888"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="font-sans antialiased">
         <Header />
@@ -113,12 +118,6 @@ export default function RootLayout({
         <GlobalAdFitBanner className="mt-4 mb-8" />
         <Footer />
         {process.env.NODE_ENV === 'production' && <Analytics />}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2046210707085888"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   )
