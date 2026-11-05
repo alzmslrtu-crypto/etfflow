@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { TickerLogo } from "@/components/ticker-logo"
 import { CompareLive } from "@/components/compare-live"
-import { COMPARE_PAIRS, pairSlug, parsePairSlug, resolveEtfInfo } from "@/lib/etf-directory"
+import { COMPARE_NOTES, COMPARE_PAIRS, pairSlug, parsePairSlug, resolveEtfInfo } from "@/lib/etf-directory"
 import { getDividendSafety, type DividendSafety } from "@/lib/dividend-safety"
 
 // 배당 이력은 자주 바뀌지 않는다. 하루 한 번 갱신.
@@ -80,6 +80,7 @@ export default async function ComparePage({
     getDividendSafety(b.symbol),
   ])
   const bothRated = Boolean(sa?.sufficient && sb?.sufficient)
+  const note = COMPARE_NOTES[pairSlug(parsed[0], parsed[1])] ?? COMPARE_NOTES[pairSlug(parsed[1], parsed[0])]
 
   return (
     <main className="min-h-screen bg-background">
@@ -205,6 +206,14 @@ export default async function ComparePage({
                 전체 ETF 배당 삭감 이력
               </Link>
             </p>
+          </section>
+        )}
+
+        {/* 선택 기준 — 쌍마다 직접 쓴 해설 */}
+        {note && (
+          <section className="mb-10">
+            <h2 className="text-lg font-bold text-foreground mb-3">어떤 쪽을 고를까</h2>
+            <p className="text-base text-foreground/90 leading-relaxed">{note}</p>
           </section>
         )}
 

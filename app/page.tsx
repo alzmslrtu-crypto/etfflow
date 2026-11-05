@@ -227,7 +227,7 @@ export default async function Page() {
               </span>
             </Link>
             
-            <Link href="/blog/dividend-reinvestment" className="group p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <Link href="/blog/drip-complete-guide" className="group p-8 bg-card rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
               <div className="inline-block px-3 py-1 bg-primary/10 rounded-full mb-4">
                 <span className="text-xs font-semibold text-primary">전략</span>
               </div>
