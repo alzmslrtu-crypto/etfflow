@@ -8,7 +8,8 @@ export function ExchangeCalculator() {
   const [loading, setLoading] = useState(true)
   // krw 기준 입력값, 방향
   const [krw, setKrw] = useState(1000000)
-  const [usd, setUsd] = useState(1000000 / 1380)
+  // 달러칸은 입력 중인 문자열 그대로 보관 (toFixed로 매번 덮으면 "12." 같은 중간 입력이 지워짐)
+  const [usd, setUsd] = useState((1000000 / 1380).toFixed(2))
   const [base, setBase] = useState<"KRW" | "USD">("KRW")
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export function ExchangeCalculator() {
       .then((d) => {
         if (active && d?.exchangeRate) {
           setRate(d.exchangeRate)
-          setUsd(krw / d.exchangeRate)
+          setUsd((krw / d.exchangeRate).toFixed(2))
         }
       })
       .finally(() => active && setLoading(false))
@@ -30,11 +31,12 @@ export function ExchangeCalculator() {
 
   const onKrw = (v: number) => {
     setKrw(v)
-    setUsd(rate > 0 ? v / rate : 0)
+    setUsd((rate > 0 ? v / rate : 0).toFixed(2))
   }
-  const onUsd = (v: number) => {
-    setUsd(v)
-    setKrw(v * rate)
+  const onUsd = (raw: string) => {
+    const text = raw.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1")
+    setUsd(text)
+    setKrw((parseFloat(text) || 0) * rate)
   }
 
   return (
@@ -68,8 +70,8 @@ export function ExchangeCalculator() {
             <input
               type="text"
               inputMode="decimal"
-              value={usd.toFixed(2)}
-              onChange={(e) => onUsd(parseFloat(e.target.value.replace(/[^0-9.]/g, "")) || 0)}
+              value={usd}
+              onChange={(e) => onUsd(e.target.value)}
               className="w-full h-12 px-4 pr-12 rounded-xl border border-border bg-background text-lg font-bold tabular-nums text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>

@@ -255,9 +255,7 @@ export function ETFComparison() {
         const isDefault = !existing || rawAmount === defaultAmounts[symbol] || rawAmount === "1000000"
         if (data && data.currentPrice > 0 && isDefault) {
           const isUSStock = data.currency === "USD"
-          const pricePerShare = displayCurrency === "KRW"
-            ? (isUSStock ? data.currentPrice * exchangeRate : data.currentPrice)
-            : (isUSStock ? data.currentPrice : data.currentPrice / exchangeRate)
+          const pricePerShare = isUSStock ? data.currentPrice * exchangeRate : data.currentPrice
           const shares = Math.floor(parseFloat(rawAmount) / pricePerShare)
           newAmounts[symbol] = String(Math.round(shares * pricePerShare))
         } else {
@@ -534,18 +532,10 @@ export function ETFComparison() {
     
     // 사용자가 KRW로 보고 있으면, 입력값은 원화이므로 달러로 환산해서 주식수 계산
     const isUSStock = data.currency === "USD"
-    let shares = 0
-    let pricePerShare = 0
-    
-    if (displayCurrency === "KRW") {
-      // 입력값: 원화, 주가를 원화로 변환해서 계산
-      pricePerShare = isUSStock ? data.currentPrice * exchangeRate : data.currentPrice
-      shares = Math.floor(investmentNum / pricePerShare)
-    } else {
-      // 입력값: 달러
-      pricePerShare = isUSStock ? data.currentPrice : data.currentPrice / exchangeRate
-      shares = Math.floor(investmentNum / pricePerShare)
-    }
+    // 시뮬레이션은 항상 원화 기준 (₩ 표기·updateShares 모두 원화). 표시 통화를 따라가면
+    // 달러 전환 시 원화 금액이 달러로 읽혀 주식 수가 환율배로 뛰는 버그가 있었다.
+    const pricePerShare = isUSStock ? data.currentPrice * exchangeRate : data.currentPrice
+    const shares = Math.floor(investmentNum / pricePerShare)
     
     // 실제 투자금 = 주수 * 주당 가격 (정수 주만 구매 가능)
     const actualInvested = Math.round(shares * pricePerShare)
