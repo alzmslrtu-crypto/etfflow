@@ -11,7 +11,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    return NextResponse.json(await getNaverEtfInfo(symbol))
+    return NextResponse.json(await getNaverEtfInfo(symbol), {
+      headers: { "Cache-Control": "public, s-maxage=600, stale-while-revalidate=3600" },
+    })
   } catch (error) {
     console.error("Naver Finance API error:", error)
     return NextResponse.json(

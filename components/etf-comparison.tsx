@@ -207,7 +207,12 @@ export function ETFComparison() {
   useEffect(() => {
     // 기본 종목: 미국 대표 배당 ETF(SCHD) + 한국 대표 배당 ETF(TIGER 미국배당다우존스)
     const DEFAULT_SYMBOLS = ["SCHD", "458730.KS"]
-    const saved = localStorage.getItem(STORAGE_KEY)
+    let saved: string | null = null
+    try {
+      saved = localStorage.getItem(STORAGE_KEY)
+    } catch {
+      // 저장소 차단(사생활 보호 모드 등) — 기본 종목으로 진행
+    }
     if (saved) {
       try {
         const parsed = JSON.parse(saved)
@@ -228,7 +233,11 @@ export function ETFComparison() {
   // 종목 변경 시 localStorage에 저장
   useEffect(() => {
     if (isInitialized && symbols.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(symbols))
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(symbols))
+      } catch {
+        // 저장 실패해도 비교 도구는 계속 동작
+      }
       // 종목 변경 시 investmentAmounts 초기화 - 주가 기반 실제 매수 가능 금액으로 설정
       const newAmounts: Record<string, string> = {}
       const defaultAmounts: Record<string, string> = {

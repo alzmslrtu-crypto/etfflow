@@ -21,12 +21,14 @@ const NAV: NavGroup[] = [
   {
     label: '계산기',
     items: [
+      { href: '/tools/real-return', label: '분배율 vs 실제 수익률' },
       { href: '/tools/dividend-goal', label: '월 배당금 목표 계산기' },
       { href: '/tools/drip', label: 'DRIP 복리 계산기' },
       { href: '/tools/tax', label: '배당소득세 계산기' },
       { href: '/tools/exchange', label: '환율 계산기' },
       { href: '/tools/dividend-yield', label: '배당수익률 계산기' },
       { href: '/tools/risk-profile', label: '투자 성향 테스트' },
+      { href: '/tools', label: '계산기 전체 보기' },
     ],
   },
   {
@@ -55,10 +57,10 @@ export function Header() {
             <div key={group.label} className="relative group">
               <button className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 {group.label}
-                <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+                <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180 group-focus-within:rotate-180" />
               </button>
               {/* 드롭다운 패널 (pt-2로 hover 끊김 방지) */}
-              <div className="absolute left-0 top-full pt-2 hidden group-hover:block">
+              <div className="absolute left-0 top-full pt-2 hidden group-hover:block group-focus-within:block">
                 <div className="min-w-[200px] bg-card border border-border rounded-xl shadow-xl p-1.5">
                   {group.items.map((item) => (
                     <Link
