@@ -203,7 +203,7 @@ export const ETF_DIRECTORY: EtfInfo[] = [
     region: "US",
     category: "미국 고배당",
     issuer: "BlackRock (iShares)",
-    dividendCycle: "분기",
+    dividendCycle: "월",
     tags: ["미국배당", "고배당", "우량주"],
     summary: "재무가 튼튼한 미국 고배당 우량주에 집중 투자하는 ETF입니다.",
     description:
@@ -291,7 +291,7 @@ export const ETF_DIRECTORY: EtfInfo[] = [
     region: "KR",
     category: "미국 배당성장 (국내상장)",
     issuer: "미래에셋자산운용",
-    dividendCycle: "분기",
+    dividendCycle: "월",
     tags: ["미국배당", "배당귀족", "S&P500", "국내상장"],
     summary: "25년 이상 배당을 늘려온 'S&P 500 배당귀족' 기업에 투자하는 국내 상장 ETF입니다.",
     description:
@@ -303,7 +303,7 @@ export const ETF_DIRECTORY: EtfInfo[] = [
     region: "KR",
     category: "리츠·인프라 (국내상장)",
     issuer: "미래에셋자산운용",
-    dividendCycle: "분기",
+    dividendCycle: "월",
     tags: ["리츠", "부동산", "인프라", "배당"],
     summary: "국내 상장 리츠와 인프라 종목에 투자해 배당(분배)을 추구하는 ETF입니다.",
     description:
@@ -556,11 +556,11 @@ export const ETF_DIRECTORY: EtfInfo[] = [
     region: "US",
     category: "미국 배당주 · 리츠",
     issuer: "-",
-    dividendCycle: "월",
-    tags: ["리츠", "부동산", "물류창고", "월배당"],
-    summary: "물류창고·산업용 부동산을 임대하는 월배당 리츠로, 전자상거래 확산의 수혜를 받습니다.",
+    dividendCycle: "분기",
+    tags: ["리츠", "부동산", "물류창고", "분기배당"],
+    summary: "물류창고·산업용 부동산을 임대하는 리츠로, 전자상거래 확산의 수혜를 받습니다.",
     description:
-      "스태그 인더스트리얼은 미국 전역의 물류창고·경공업 건물을 소유하고 임대하는 산업용 리츠로, 월배당을 지급합니다. 전자상거래 확산으로 물류 공간 수요가 늘며 임대 여건이 개선돼 왔습니다. 임차인이 특정 산업에 쏠리지 않고 여러 업종에 분산돼 있어 개별 임차인 위험이 낮은 편입니다. 배당 인상 폭은 완만하며, 금리와 산업 경기에 따라 주가 변동이 있으므로 월배당 현금흐름과 주가 흐름을 함께 봐야 합니다.",
+      "스태그 인더스트리얼은 미국 전역의 물류창고·경공업 건물을 소유하고 임대하는 산업용 리츠입니다. 오랫동안 월배당을 지급했으나 2026년부터 분기 지급으로 바뀌었습니다. 전자상거래 확산으로 물류 공간 수요가 늘며 임대 여건이 개선돼 왔습니다. 임차인이 특정 산업에 쏠리지 않고 여러 업종에 분산돼 있어 개별 임차인 위험이 낮은 편입니다. 배당 인상 폭은 완만하며, 금리와 산업 경기에 따라 주가 변동이 있으므로 배당 현금흐름과 주가 흐름을 함께 봐야 합니다.",
   },
   {
     symbol: "ARCC",

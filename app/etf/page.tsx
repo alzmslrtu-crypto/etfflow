@@ -15,13 +15,20 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.etfflow.kr/etf" },
 }
 
-type Group = { title: string; desc: string; filter: (e: EtfInfo) => boolean }
+type Group = { title: string; desc: string; filter: (e: EtfInfo, live?: EtfSummary) => boolean }
+
+// 배당 주기: 실제 지급 이력으로 판정한 값을 우선 쓴다. 디렉터리의 고정값은 종목이 주기를 바꾸면
+// 낡는다(2026-11 점검 때 HDV 분기→월, STAG 월→분기 등 4건). 조회 실패 시에만 고정값으로 대체.
+const LIVE_CYCLE: Record<number, string> = { 52: "주", 12: "월", 4: "분기", 2: "반기", 1: "연" }
+function cycleOf(etf: EtfInfo, live?: EtfSummary): string {
+  return (live && LIVE_CYCLE[live.yearlyDividendCount]) || etf.dividendCycle
+}
 
 const GROUPS: Group[] = [
   {
     title: "월배당 ETF",
     desc: "매월 분배금을 지급하는 ETF — 매달 현금흐름을 원하는 투자자에게 인기",
-    filter: (e) => e.dividendCycle === "월",
+    filter: (e, live) => ["월", "주"].includes(cycleOf(e, live)),
   },
   {
     title: "미국 배당성장 ETF",
@@ -60,7 +67,7 @@ function EtfCard({ etf, live }: { etf: EtfInfo; live?: EtfSummary }) {
       <div className="min-w-0 flex-1">
         <div className="font-semibold text-foreground truncate">{etf.name}</div>
         <div className="text-xs text-muted-foreground truncate">
-          {etf.dividendCycle !== "비정기" ? `${etf.dividendCycle} 배당 · ` : ""}{etf.issuer}
+          {cycleOf(etf, live) !== "비정기" ? `${cycleOf(etf, live)} 배당 · ` : ""}{etf.issuer}
         </div>
         {live && live.dividendYield > 0 && (
           <div className="text-xs mt-1 tabular-nums">
@@ -103,7 +110,7 @@ export default async function EtfIndexPage() {
 
         <div className="space-y-12">
           {GROUPS.map((group) => {
-            const items = ETF_DIRECTORY.filter(group.filter)
+            const items = ETF_DIRECTORY.filter((e) => group.filter(e, live[e.symbol]))
             if (items.length === 0) return null
             return (
               <section key={group.title}>

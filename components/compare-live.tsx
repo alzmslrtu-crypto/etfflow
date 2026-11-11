@@ -34,7 +34,7 @@ function assets(v: number, currency: string): string {
   return `$${Math.round(v).toLocaleString()}`
 }
 
-const CYCLE: Record<number, string> = { 12: "매월", 4: "분기", 2: "반기", 1: "연 1회" }
+const CYCLE: Record<number, string> = { 52: "매주", 12: "매월", 4: "분기", 2: "반기", 1: "연 1회" }
 
 async function fetchOne(symbol: string): Promise<StockData | null> {
   try {

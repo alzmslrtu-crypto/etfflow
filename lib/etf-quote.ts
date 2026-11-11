@@ -2,6 +2,7 @@
 // API 라우트(/api/stock)와 서버 컴포넌트가 함께 쓴다.
 import YahooFinance from "yahoo-finance2"
 import { getNaverEtfInfo } from "@/lib/naver-quote"
+import { trailingDividendInfo, dividendMonths } from "@/lib/dividend-calc"
 
 // Initialize Yahoo Finance v3 instance with ETF data support
 const yahooFinance = new YahooFinance({ suppressNotices: ["yahooSurvey", "ripHistorical"] })
@@ -21,12 +22,56 @@ export type EtfQuote = {
   yearlyDividendCount: number
   chartData: { date: string; price: number; totalReturn: number }[]
   dividendHistory: { date: string; amount: number }[]
+  /** 최근 1년 배당(annualDividend 합계의 근거). 월별 예상 배당 계산용 */
+  trailingDividends: { date: string; amount: number }[]
+  /** dividendHistory 조회 시작일(YYYY-01-01). 연도별 차트의 첫해 판정용 */
+  dividendHistoryStart: string
   fiftyTwoWeekHigh: number
   fiftyTwoWeekLow: number
   marketCap: number
   netAssets: number
   expenseRatio: number
   exDividendDate: string | null
+}
+
+const sumAmounts = (xs: { amount: number }[]) => xs.reduce((sum, x) => sum + x.amount, 0)
+
+/**
+ * 야후 quote의 배당수익률(%).
+ * dividendYield는 이미 % 단위(0.46 = 0.46%), trailingAnnualDividendYield는 소수(0.0078 = 0.78%)다.
+ * 예전처럼 "1 미만이면 ×100"으로 추정하면 수익률 1% 미만 종목이 100배가 된다(QQQM 0.46% → 46% 실측).
+ */
+function yahooYieldPercent(quote: object): number {
+  const q = quote as { dividendYield?: number; trailingAnnualDividendYield?: number }
+  return q.dividendYield || (q.trailingAnnualDividendYield || 0) * 100
+}
+
+/** 배당 이력(배당락일, 1주당 금액). 날짜 오름차순, 0원 행 제외. 실패하면 빈 배열. */
+async function fetchDividendHistory(symbol: string, period1: string, period2: Date) {
+  try {
+    const rows = await yahooFinance.historical(symbol, { period1, period2, events: "dividends" })
+    return (rows ?? [])
+      .map((div) => ({
+        date: new Date(div.date).toISOString().split("T")[0],
+        amount: (div as unknown as { dividends: number }).dividends || 0,
+      }))
+      .filter((div) => div.amount > 0)
+      .sort((x, y) => x.date.localeCompare(y.date))
+  } catch {
+    return []
+  }
+}
+
+/**
+ * 배당수익률(%)과 1주당 연 배당금. 상세(getEtfQuote)와 목록(getEtfSummaries)이
+ * 같은 종목에 다른 수익률을 보여주지 않도록 한 곳에서 정한다.
+ * 우선순위: 실제 지급 이력(최근 1년) → 네이버(국내 ETF) → 야후 quote 제공값.
+ * (야후 trailing 값은 갱신이 늦다: VOO 0.79% vs 이력 기준 1.08%, 2026-11 실측)
+ */
+function resolveDividend(ttm: number, price: number, naverYield: number, yahooYield: number) {
+  if (ttm > 0 && price > 0) return { dividendYield: (ttm / price) * 100, annualDividend: ttm }
+  const dividendYield = naverYield > 0 ? naverYield : yahooYield
+  return { dividendYield, annualDividend: ttm > 0 ? ttm : (dividendYield / 100) * price }
 }
 
 export async function getEtfQuote(symbol: string, period = "1Y"): Promise<EtfQuote> {
@@ -122,101 +167,21 @@ export async function getEtfQuote(symbol: string, period = "1Y"): Promise<EtfQuo
     totalReturn: Math.round(((item.price - startPrice) / startPrice) * 10000) / 100,
   }))
 
-  // Get dividend info from Yahoo Finance
-  const annualDividendRate = quote.trailingAnnualDividendRate ?? quote.dividendRate ?? 0
-  const dividendYieldRaw = quote.trailingAnnualDividendYield ?? quote.dividendYield ?? 0
+  // 배당 이력: 5년 전 1월 1일부터 받는다. 연도별 합계의 첫해가 일부만 잡혀
+  // 배당 삭감처럼 보이지 않게 하기 위해서다(5년 전 오늘부터 받으면 첫해는 한두 회차뿐).
+  const dividendHistoryStart = `${endDate.getFullYear() - 5}-01-01`
+  const dividendHistory = await fetchDividendHistory(symbol, dividendHistoryStart, endDate)
 
-  // Yahoo returns yield as decimal (0.0123 = 1.23%), convert to percentage if needed
-  // If value is already > 1, it's likely already a percentage
-  let dividendYieldPercent = 0
-  if (dividendYieldRaw > 0) {
-    dividendYieldPercent = dividendYieldRaw < 1 ? dividendYieldRaw * 100 : dividendYieldRaw
-  }
+  // 최근 1년 배당·지급 주기 (기준점·경계 처리는 lib/dividend-calc.ts 주석 참고)
+  const { trailing: trailingDividends, frequency: yearlyDividendCount } = trailingDividendInfo(dividendHistory, endDate)
+  const dividendPaymentMonths = dividendMonths(trailingDividends, yearlyDividendCount)
 
-  // Fetch dividend history using historical API for accurate dividend dates
-  let dividendHistory: { date: string; amount: number }[] = []
-  let dividendPaymentMonths: number[] = []
-  let yearlyDividendCount = 0
-
-  try {
-    // For dividend history, always fetch last 5 years for complete dividend pattern
-    // This ensures we get all dividend months regardless of the selected chart period
-    const dividendStartDate = new Date()
-    dividendStartDate.setFullYear(dividendStartDate.getFullYear() - 5)
-
-    const divHistory = await yahooFinance.historical(symbol, {
-      period1: dividendStartDate,
-      period2: endDate,
-      events: "dividends",
-    })
-
-    if (divHistory && divHistory.length > 0) {
-      dividendHistory = divHistory.map((div) => ({
-        date: new Date(div.date).toISOString().split("T")[0],
-        amount: (div as unknown as { dividends: number }).dividends || 0,
-      }))
-
-      // Get all dividend months from dividend history (not filtering by year)
-      // This shows all months the company pays dividends
-      if (dividendHistory.length > 0) {
-        dividendPaymentMonths = dividendHistory
-          .map((div) => new Date(div.date).getMonth() + 1)
-          .filter((v, i, a) => a.indexOf(v) === i) // unique months
-          .sort((a, b) => a - b)
-
-        // Calculate yearly dividend count based on actual dividend frequency
-        const uniqueMonthCount = dividendPaymentMonths.length
-
-        // Count dividends in the last 12 months for frequency validation
-        const oneYearAgoForCount = new Date()
-        oneYearAgoForCount.setFullYear(oneYearAgoForCount.getFullYear() - 1)
-        const lastYearDividendCount = dividendHistory.filter(
-          (div) => new Date(div.date) >= oneYearAgoForCount
-        ).length
-
-        // Determine payment frequency based on actual pattern
-        if (uniqueMonthCount === 12 || (uniqueMonthCount >= 11 && lastYearDividendCount >= 11)) {
-          yearlyDividendCount = 12 // Monthly payer (JEPI, JEPQ, etc.)
-          // For monthly payers, ensure all 12 months are shown
-          dividendPaymentMonths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-        } else if (uniqueMonthCount === 4 || (uniqueMonthCount >= 3 && lastYearDividendCount >= 3)) {
-          yearlyDividendCount = 4 // Quarterly payer (SCHD, VOO, QQQ, etc.)
-        } else if (uniqueMonthCount === 2 || (uniqueMonthCount >= 1 && lastYearDividendCount >= 2)) {
-          yearlyDividendCount = 2 // Semi-annual payer
-        } else if (uniqueMonthCount === 1 || lastYearDividendCount === 1) {
-          yearlyDividendCount = 1 // Annual payer
-        } else {
-          yearlyDividendCount = Math.max(uniqueMonthCount, lastYearDividendCount, 1)
-        }
-      }
-    }
-  } catch {
-    // Dividend history might not be available for all stocks
-  }
-
-  // Calculate 1-year total dividend from history
-  const oneYearAgo = new Date()
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
-  const lastYearDividends = dividendHistory.filter((div) => new Date(div.date) >= oneYearAgo)
-  const totalDividendLastYear = lastYearDividends.reduce((sum, div) => sum + div.amount, 0)
-
-  // Calculate actual dividend yield from history if available
-  const currentPrice = quote.regularMarketPrice || 0
-  const actualAnnualDividend = totalDividendLastYear || annualDividendRate
-  let calculatedYield =
-    currentPrice > 0 && actualAnnualDividend > 0
-      ? (actualAnnualDividend / currentPrice) * 100
-      : dividendYieldPercent
-
-  // 한국 ETF는 야후 배당 데이터가 비어있는 경우가 많아 네이버 배당수익률로 보완
-  let finalAnnualDividend = actualAnnualDividend
-  if ((calculatedYield === 0 || actualAnnualDividend === 0) && naverDividendYield > 0) {
-    calculatedYield = naverDividendYield
-    // 배당수익률과 현재가로 1주당 연 배당금 역산
-    if (currentPrice > 0) {
-      finalAnnualDividend = (naverDividendYield / 100) * currentPrice
-    }
-  }
+  const { dividendYield: calculatedYield, annualDividend: finalAnnualDividend } = resolveDividend(
+    sumAmounts(trailingDividends),
+    quote.regularMarketPrice || 0,
+    naverDividendYield,
+    yahooYieldPercent(quote),
+  )
 
   return {
     symbol: quote.symbol,
@@ -233,6 +198,8 @@ export async function getEtfQuote(symbol: string, period = "1Y"): Promise<EtfQuo
     yearlyDividendCount,
     chartData: normalizedData,
     dividendHistory,
+    trailingDividends,
+    dividendHistoryStart,
     fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
     fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
     marketCap: quote.marketCap || 0,
@@ -252,6 +219,8 @@ export type EtfSummary = {
   dividendYield: number
   expenseRatio: number
   netAssets: number
+  /** 최근 지급 간격으로 판정한 연 지급 횟수(0 = 판정 불가). 디렉터리의 고정 주기 대신 쓴다 */
+  yearlyDividendCount: number
 }
 
 // 목록·그리드용 경량 조회. 차트·배당이력 없이 핵심 지표만 배치로 가져온다.
@@ -270,36 +239,48 @@ export async function getEtfSummaries(symbols: string[]): Promise<Record<string,
   for (const quote of quotes) {
     if (!quote?.symbol) continue
     const etf = quote as unknown as { netAssets?: number; netExpenseRatio?: number; totalAssets?: number }
-    // ?? 가 아니라 || 를 쓴다. 야후는 값이 없을 때 undefined가 아니라 0을 넣어 보내므로
-    // ?? 로는 다음 후보(dividendYield)로 넘어가지 못한다.
-    const yieldRaw = quote.trailingAnnualDividendYield || quote.dividendYield || 0
     out[quote.symbol] = {
       symbol: quote.symbol,
       currency: quote.currency || "USD",
       currentPrice: quote.regularMarketPrice || 0,
       priceChangePercent: quote.regularMarketChangePercent || 0,
-      dividendYield: yieldRaw > 0 ? (yieldRaw < 1 ? yieldRaw * 100 : yieldRaw) : 0,
+      dividendYield: yahooYieldPercent(quote), // 아래에서 지급 이력·네이버 기준으로 다시 정한다
       expenseRatio: etf.netExpenseRatio || 0,
       netAssets: etf.netAssets || etf.totalAssets || quote.marketCap || 0,
+      yearlyDividendCount: 0,
     }
   }
 
-  // 한국 상장 ETF는 야후에 배당수익률·보수가 비어 있어 네이버로 보완한다.
-  const koreanSymbols = symbols.filter((s) => s.endsWith(".KS") || s.endsWith(".KQ"))
-  await Promise.all(
-    koreanSymbols.map(async (symbol) => {
-      const base = out[symbol]
-      if (!base) return
-      try {
-        const naver = await getNaverEtfInfo(symbol)
-        if (naver.dividendYield > 0) base.dividendYield = naver.dividendYield
-        if (naver.expenseRatio > 0) base.expenseRatio = naver.expenseRatio
-        if (naver.netAssets > 0) base.netAssets = naver.netAssets
-      } catch {
-        // 네이버 실패 시 야후 값 유지
-      }
-    })
-  )
+  // 배당수익률은 상세 페이지와 같은 방식(최근 1년 실제 지급 이력)으로 계산한다.
+  // 야후 동시 호출 제한을 피하려고 5개씩 나눠 조회한다.
+  const now = new Date()
+  const historyStart = `${now.getFullYear() - 5}-01-01`
+  const found = Object.keys(out)
+  for (let i = 0; i < found.length; i += 5) {
+    await Promise.all(
+      found.slice(i, i + 5).map(async (symbol) => {
+        const base = out[symbol]
+        const history = await fetchDividendHistory(symbol, historyStart, now)
+        const { trailing, frequency } = trailingDividendInfo(history, now)
+        const ttm = sumAmounts(trailing)
+        base.yearlyDividendCount = frequency
+
+        // 한국 상장 ETF는 야후에 보수·순자산이 비어 있어 네이버로 보완한다.
+        let naverYield = 0
+        if (symbol.endsWith(".KS") || symbol.endsWith(".KQ")) {
+          try {
+            const naver = await getNaverEtfInfo(symbol)
+            naverYield = naver.dividendYield
+            if (naver.expenseRatio > 0) base.expenseRatio = naver.expenseRatio
+            if (naver.netAssets > 0) base.netAssets = naver.netAssets
+          } catch {
+            // 네이버 실패 시 야후 값 유지
+          }
+        }
+        base.dividendYield = resolveDividend(ttm, base.currentPrice, naverYield, base.dividendYield).dividendYield
+      }),
+    )
+  }
 
   return out
 }

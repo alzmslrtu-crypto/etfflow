@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts"
 import { Loader2, Plus, Check, TrendingUp, TrendingDown } from "lucide-react"
+import { yearlyDividendTotals } from "@/lib/dividend-calc"
 
 const STORAGE_KEY = "etf-comparison-symbols"
 
@@ -28,6 +29,7 @@ type StockData = {
   dividendPaymentMonths: number[]
   yearlyDividendCount: number
   dividendHistory: { date: string; amount: number }[]
+  dividendHistoryStart: string
   fiftyTwoWeekHigh: number
   fiftyTwoWeekLow: number
   netAssets: number
@@ -53,7 +55,7 @@ function assets(v: number, currency: string): string {
   return `$${Math.round(v).toLocaleString()}`
 }
 
-const CYCLE_LABEL: Record<number, string> = { 12: "매월", 4: "분기", 2: "반기", 1: "연 1회" }
+const CYCLE_LABEL: Record<number, string> = { 52: "매주", 12: "매월", 4: "분기", 2: "반기", 1: "연 1회" }
 
 export function EtfLiveStats({
   symbol,
@@ -124,15 +126,19 @@ export function EtfLiveStats({
 
   const isPositive = data.priceChangePercent >= 0
 
-  // 연도별 배당금 합계 (최근 5년)
-  const yearlyMap: Record<string, number> = {}
-  data.dividendHistory?.forEach((d) => {
-    const year = d.date.substring(0, 4)
-    yearlyMap[year] = (yearlyMap[year] || 0) + d.amount
-  })
-  const yearlyDividends = Object.entries(yearlyMap)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([year, amount]) => ({ year, amount: Math.round(amount * 100) / 100 }))
+  // 연도별 배당금 합계. 배당을 중간에 시작한 첫해(일부 회차만 있음)는 삭감처럼 보이므로 빼고,
+  // 올해는 아직 남은 회차가 있으니 '(진행중)'으로 표시한다.
+  const yearlyDividends = yearlyDividendTotals(
+    data.dividendHistory ?? [],
+    data.yearlyDividendCount,
+    parseInt((data.dividendHistoryStart || "0").slice(0, 4)),
+    new Date(),
+  )
+    .filter((y) => y.partial !== "start")
+    .map((y) => ({
+      year: y.partial === "current" ? `${y.year}(진행중)` : String(y.year),
+      amount: Math.round(y.amount * 100) / 100,
+    }))
 
   const cycleLabel = CYCLE_LABEL[data.yearlyDividendCount] || (data.yearlyDividendCount > 0 ? `연 ${data.yearlyDividendCount}회` : "-")
 
@@ -157,7 +163,12 @@ export function EtfLiveStats({
           </div>
           <div className={`flex items-center gap-1 text-sm font-semibold tabular-nums mt-1 ${isPositive ? "text-stock-up" : "text-stock-down"}`}>
             {isPositive ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-            {isPositive ? "+" : ""}{money(data.priceChange, data.currency)} ({isPositive ? "+" : ""}{data.priceChangePercent.toFixed(2)}%)
+            {/* 부호를 통화기호 앞에 둔다($-0.28 → -$0.28). money()는 0을 "-"로 바꾸므로 0은 따로 처리 */}
+            {data.priceChange > 0 ? "+" : data.priceChange < 0 ? "-" : ""}
+            {data.priceChange === 0
+              ? data.currency === "KRW" ? "₩0" : "$0.00"
+              : money(Math.abs(data.priceChange), data.currency)}{" "}
+            ({isPositive ? "+" : ""}{data.priceChangePercent.toFixed(2)}%)
           </div>
         </div>
         <button
@@ -181,10 +192,11 @@ export function EtfLiveStats({
         ))}
       </div>
 
-      {/* 배당 지급월 */}
+      {/* 배당락월 */}
       {data.dividendPaymentMonths?.length > 0 && (
         <div className="rounded-xl border border-border bg-card p-4">
-          <div className="text-sm font-semibold text-foreground mb-3">배당 지급월</div>
+          <div className="text-sm font-semibold text-foreground mb-1">배당락월</div>
+          <p className="text-xs text-muted-foreground mb-3">최근 1년 배당락일이 속한 달입니다. 실제 입금은 배당락일 이후라 다음 달이 될 수 있습니다.</p>
           <div className="flex flex-wrap gap-1.5">
             {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => {
               const on = data.dividendPaymentMonths.includes(m)

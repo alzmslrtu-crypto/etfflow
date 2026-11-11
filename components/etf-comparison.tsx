@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef, type KeyboardEvent } from "react"
+import { yearlyDividendTotals } from "@/lib/dividend-calc"
 import { TickerLogo } from "@/components/ticker-logo"
 import {
   LineChart,
@@ -69,7 +70,7 @@ function formatAssets(
   return `$${Math.round(v).toLocaleString()}`
 }
 
-function CustomTooltip({ active, payload, label, type }: any) {
+function CustomTooltip({ active, payload, label, type, currency }: any) {
   if (!active || !payload || !payload.length) return null
   return (
     <div className="bg-card border border-border rounded-lg shadow-lg px-3 py-2 text-xs">
@@ -81,7 +82,9 @@ function CustomTooltip({ active, payload, label, type }: any) {
           <span className="tabular-nums ml-auto pl-3" style={{ color: entry.color }}>
             {type === "returns"
               ? `${entry.value >= 0 ? "+" : ""}${Number(entry.value).toFixed(2)}%`
-              : `$${Number(entry.value).toFixed(2)}`}
+              : currency === "KRW"
+                ? `₩${Math.round(Number(entry.value)).toLocaleString()}`
+                : `$${Number(entry.value).toFixed(2)}`}
           </span>
         </div>
       ))}
@@ -104,6 +107,8 @@ type StockData = {
   yearlyDividendCount: number
   chartData: { date: string; price: number; totalReturn: number }[]
   dividendHistory: { date: string; amount: number }[]
+  trailingDividends: { date: string; amount: number }[]
+  dividendHistoryStart: string
   exDividendDate: string | null
   netAssets: number
   expenseRatio: number
@@ -418,73 +423,52 @@ export function ETFComparison() {
     return result.filter((_, i) => i % step === 0 || i === result.length - 1)
   })()
 
-  // 월별 배당금 차트 데이터
+  // 월별 배당금 차트 데이터 (배당락일 기준, 표시 통화로 환산)
+  // 종목마다 통화가 달라(SCHD $, TIGER ₩) 원래 통화 그대로 한 축에 그리면 비교가 안 된다.
   const monthlyDividendChartData = (() => {
     const monthlyData: Record<string, Record<string, number>> = {}
-    const currentYear = new Date().getFullYear()
-    
-    const periodYears: Record<string, number> = {
-      "1Y": 1,
-      "3Y": 3,
-      "5Y": 5,
-      "10Y": 10,
-      "MAX": 100
-    }
-    const yearsToShow = periodYears[period] || 5
-    const startYear = currentYear - yearsToShow
-    
+    const periodYears: Record<string, number> = { "1Y": 1, "3Y": 3, "5Y": 5, "10Y": 10, "MAX": 100 }
+    const cutoff = new Date()
+    cutoff.setFullYear(cutoff.getFullYear() - (periodYears[period] || 5))
+    const cutoffStr = cutoff.toISOString().slice(0, 10)
+
     symbols.forEach((symbol) => {
       const data = stockDataMap[symbol]
-      if (data?.dividendHistory) {
-        data.dividendHistory.forEach((div) => {
-          const date = new Date(div.date)
-          const year = date.getFullYear()
-          if (year >= startYear) {
-            const month = date.getMonth() + 1
-            const key = `${year}-${String(month).padStart(2, '0')}`
-            if (!monthlyData[key]) monthlyData[key] = {}
-            monthlyData[key][symbol] = (monthlyData[key][symbol] || 0) + div.amount
-          }
-        })
-      }
+      data?.dividendHistory?.forEach((div) => {
+        if (div.date < cutoffStr) return
+        const key = div.date.slice(0, 7)
+        if (!monthlyData[key]) monthlyData[key] = {}
+        monthlyData[key][symbol] =
+          (monthlyData[key][symbol] || 0) + convertCurrency(div.amount, data.currency, displayCurrency, exchangeRate)
+      })
     })
-    
+
     return Object.entries(monthlyData)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([month, values]) => ({ 
-        month: month.slice(5), // MM 형식
+      .map(([month, values]) => ({
+        month: `${month.slice(2, 4)}.${month.slice(5, 7)}`, // 26.03 — 여러 해가 섞여도 구분되게
         fullMonth: month,
-        ...values 
+        ...values
       }))
   })()
+  // 연도별 배당금 차트 데이터 (표시 통화로 환산)
+  // 배당을 중간에 시작한 첫해(일부 회차만 있음)는 삭감처럼 보이므로 빼고, 올해는 '(진행중)'으로 표시한다.
   const dividendChartData = (() => {
     const yearlyDividends: Record<string, Record<string, number>> = {}
-    const currentYear = new Date().getFullYear()
-    
-    // period에 따른 시작 연도 계산
-    const periodYears: Record<string, number> = {
-      "1Y": 1,
-      "3Y": 3,
-      "5Y": 5,
-      "10Y": 10,
-      "MAX": 100
-    }
-    const yearsToShow = periodYears[period] || 5
-    const startYear = currentYear - yearsToShow
-    
+    const now = new Date()
+    const periodYears: Record<string, number> = { "1Y": 1, "3Y": 3, "5Y": 5, "10Y": 10, "MAX": 100 }
+    const startYear = now.getFullYear() - (periodYears[period] || 5)
+
     symbols.forEach((symbol) => {
       const data = stockDataMap[symbol]
-      if (data?.dividendHistory) {
-        data.dividendHistory.forEach((div) => {
-          const year = parseInt(div.date.substring(0, 4))
-          // 선택한 기간 내의 데이터만 포함
-          if (year >= startYear) {
-            const yearStr = year.toString()
-            if (!yearlyDividends[yearStr]) yearlyDividends[yearStr] = {}
-            yearlyDividends[yearStr][symbol] = (yearlyDividends[yearStr][symbol] || 0) + div.amount
-          }
-        })
-      }
+      if (!data?.dividendHistory) return
+      const historyStartYear = parseInt((data.dividendHistoryStart || "0").slice(0, 4))
+      yearlyDividendTotals(data.dividendHistory, data.yearlyDividendCount, historyStartYear, now).forEach((y) => {
+        if (y.year < startYear || y.partial === "start") return
+        const label = y.partial === "current" ? `${y.year}(진행중)` : String(y.year)
+        if (!yearlyDividends[label]) yearlyDividends[label] = {}
+        yearlyDividends[label][symbol] = convertCurrency(y.amount, data.currency, displayCurrency, exchangeRate)
+      })
     })
     return Object.entries(yearlyDividends)
       .sort(([a], [b]) => a.localeCompare(b))
@@ -733,8 +717,10 @@ export function ETFComparison() {
           )}
         </div>
 
+        {/* PC(xl 이상): 왼쪽 차트·비교표, 오른쪽 시뮬레이터 패널(스크롤해도 고정). 그 아래 폭은 기존처럼 세로로 쌓인다. */}
+        <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-6 xl:items-start">
         {/* Chart Section */}
-        <Card className="bg-card border-border mb-8">
+        <Card className="bg-card border-border mb-8 xl:mb-0">
           <CardContent className="p-3 sm:p-6">
             {/* Chart Controls */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 pb-4 border-b border-border">
@@ -850,6 +836,7 @@ export function ETFComparison() {
                     <CartesianGrid strokeDasharray="4 4" stroke="var(--border)" strokeOpacity={0.5} vertical={false} />
                     <XAxis
                       dataKey={dividendChartType === "yearly" ? "year" : "month"}
+                      padding={{ left: 28, right: 28 }}
                       tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                       tickLine={false}
                       axisLine={false}
@@ -858,10 +845,12 @@ export function ETFComparison() {
                       tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                       tickLine={false}
                       axisLine={false}
-                      tickFormatter={(value) => `$${Math.round(value).toLocaleString()}`}
+                      tickFormatter={(value) =>
+                        displayCurrency === "KRW" ? `₩${Math.round(value).toLocaleString()}` : `$${Number(value).toFixed(2)}`
+                      }
                       width={50}
                     />
-                    <Tooltip content={<CustomTooltip type="dividend" />} />
+                    <Tooltip content={<CustomTooltip type="dividend" currency={displayCurrency} />} />
                     {symbols.map((symbol, index) => (
                       <Line
                         key={symbol}
@@ -872,7 +861,7 @@ export function ETFComparison() {
                         dot={(props: any) => {
                           const { cx, cy, payload } = props
                           const value = payload[symbol]
-                          if (!value) return <g />
+                          if (!value) return <g key={`${symbol}-dot-empty-${props.index}`} />
                           return (
                             <g key={`${symbol}-dot-${payload.year || payload.month}`}>
                               <circle
@@ -891,7 +880,7 @@ export function ETFComparison() {
                                 fontSize="11"
                                 fontWeight="600"
                               >
-                                ${value.toFixed(2)}
+                                {displayCurrency === "KRW" ? `₩${Math.round(value).toLocaleString()}` : `$${value.toFixed(2)}`}
                               </text>
                             </g>
                           )
@@ -964,7 +953,7 @@ export function ETFComparison() {
                           </div>
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">배당횟수</span>
-                            <span className="font-semibold">연 {Math.round(data.yearlyDividendCount)}회</span>
+                            <span className="font-semibold">{data.yearlyDividendCount > 0 ? `연 ${data.yearlyDividendCount}회` : "-"}</span>
                           </div>
                         </div>
                       )}
@@ -1058,7 +1047,7 @@ export function ETFComparison() {
                           : "-",
                       },
                       {
-                        label: "배당월",
+                        label: "배당락월",
                         render: (symbol: string, data: any) => {
                           if (!data || data.dividendPaymentMonths.length === 0) return "-"
                           const months: number[] = data.dividendPaymentMonths
@@ -1095,7 +1084,7 @@ export function ETFComparison() {
         </Card>
 
         {/* Unified Investment Simulator + Monthly Dividend */}
-        <Card className="bg-card border-border mt-6">
+        <Card className="bg-card border-border mt-6 xl:mt-0 xl:sticky xl:top-20">
           <CardContent className="p-3 sm:p-6">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 pb-4 border-b border-border gap-3">
@@ -1151,7 +1140,7 @@ export function ETFComparison() {
                 ]
 
                 return (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-2 gap-2 sm:gap-3">
                     {items.map((it) => (
                       <div
                         key={it.label}
@@ -1264,9 +1253,15 @@ export function ETFComparison() {
                 })}
               </div>
 
-              {/* Monthly Dividend Section - Only months with dividends */}
-              <div className="rounded-2xl bg-card border border-border p-5">
-                <div className="text-base font-semibold text-foreground mb-5">배당금은 이렇게 들어와요</div>
+            </div>
+          </CardContent>
+        </Card>
+        </div>
+
+        {/* 월별 예상 배당: 화면 폭 전체 사용 (PC 옆 패널 안에 두면 패널 속 스크롤이 생겨 불편했다) */}
+        <Card className="bg-card border-border mt-6">
+          <CardContent className="p-3 sm:p-6">
+                <h2 className="text-base font-semibold text-foreground mb-5">배당금은 이렇게 들어와요</h2>
                 {(() => {
                   const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
                   const chartData = months.map((month, idx) => {
@@ -1275,8 +1270,9 @@ export function ETFComparison() {
                     symbols.forEach((symbol) => {
                       const data = stockDataMap[symbol]
                       const { shares } = calculateInvestment(symbol, data)
-                      if (data?.dividendHistory && shares > 0) {
-                        const dividendPerShare = data.dividendHistory
+                      if (data?.trailingDividends && shares > 0) {
+                        // 최근 1년 배당만 쓴다(위 요약의 연 예상 배당금과 같은 근거). 5년 이력 전체를 쓰면 4~5배로 부풀려진다.
+                        const dividendPerShare = data.trailingDividends
                           .filter(d => parseInt(d.date.substring(5, 7)) === idx + 1)
                           .reduce((sum, d) => sum + d.amount, 0)
                         // 종목별 통화를 원화로 환산 (한국 종목은 이미 원화) + 세후 반영
@@ -1288,7 +1284,7 @@ export function ETFComparison() {
                         }
                       }
                     })
-                    return { month, monthKRW: Math.round(monthKRWTotal), bySymbol }
+                    return { month, monthKRW: monthKRWTotal, bySymbol }
                   })
 
                   // 배당이 있는 종목만 범례에 표시
@@ -1297,14 +1293,23 @@ export function ETFComparison() {
                   )
 
                   const monthsWithDividend = chartData.filter(d => d.monthKRW > 0)
-                  const totalAnnual = chartData.reduce((sum, d) => sum + d.monthKRW, 0)
+                  // 반올림 전 값을 합산해야 위 요약 카드의 연 예상 배당금과 원 단위까지 맞는다.
+                  const totalAnnual = Math.round(chartData.reduce((sum, d) => sum + d.monthKRW, 0))
+                  // 연 배당은 있는데 지급 이력이 없는 종목(네이버 수익률로 역산한 경우)은 월별로 나눌 수 없다.
+                  const noHistorySymbols = symbols.filter((symbol) => {
+                    const data = stockDataMap[symbol]
+                    return data && data.annualDividend > 0 && calculateInvestment(symbol, data).shares > 0 &&
+                      !(data.trailingDividends?.length > 0)
+                  })
                   const maxMonthAmount = Math.max(...chartData.map(d => d.monthKRW), 1)
                   const monthsCount = monthsWithDividend.length
 
                   if (monthsWithDividend.length === 0) {
                     return (
                       <div className="text-sm text-muted-foreground text-center py-8">
-                        투자 금액을 입력하면 배당금을 확인할 수 있어요
+                        {noHistorySymbols.length > 0
+                          ? `${noHistorySymbols.join(", ")}의 월별 배당 이력을 불러오지 못했습니다`
+                          : "투자 금액을 입력하면 배당금을 확인할 수 있어요"}
                       </div>
                     )
                   }
@@ -1321,10 +1326,12 @@ export function ETFComparison() {
                               return monthNum
                             })
 
-                            if (monthsCount === 12) return "매월 배당"
-                            if (monthsCount === 4 && JSON.stringify(dividendMonths.sort((a,b) => a-b)) === JSON.stringify([3,6,9,12])) return "분기 배당"
-                            if (monthsCount === 11 && !dividendMonths.includes(1)) return "11개월 배당 (1월 제외)"
-                            return `${monthsCount}개월 배당`
+                            // 월배당 ETF도 배당락일이 12/31이면 1월분이 12월에 잡혀 11개월로 보인다.
+                            // 개월 수로 추정하지 말고 종목의 실제 지급 주기로 판정한다.
+                            const freqs = contributingSymbols.map((sym) => stockDataMap[sym]?.yearlyDividendCount ?? 0)
+                            if (monthsCount === 12 || (freqs.length > 0 && freqs.every((f) => f >= 12))) return "매월 배당"
+                            if (freqs.length > 0 && freqs.every((f) => f === 4) && monthsCount === 4) return "분기 배당"
+                            return `${dividendMonths.length}개월 배당`
                           })()}
                         </div>
                         {contributingSymbols.length > 1 && (
@@ -1339,35 +1346,79 @@ export function ETFComparison() {
                         )}
                       </div>
 
-                      {/* Only show months with dividends - 종목별 색상 누적 막대 */}
-                      {monthsWithDividend.map((d) => (
-                        <div key={d.month} className="flex items-center gap-4">
-                          <div className="w-12 text-sm font-medium text-muted-foreground">{d.month}</div>
-                          <div className="flex-1 h-3 bg-muted/30 rounded-full overflow-hidden flex">
-                            {symbols.map((symbol) => {
-                              const v = d.bySymbol[symbol] || 0
-                              if (v <= 0) return null
-                              return (
-                                <div
-                                  key={symbol}
-                                  className="h-full transition-all"
-                                  style={{ width: `${(v / maxMonthAmount) * 100}%`, backgroundColor: COLORS[symbols.indexOf(symbol)] }}
-                                  title={`${symbol} ₩${Math.round(v).toLocaleString()}`}
-                                />
-                              )
-                            })}
+                      {/* 다음 배당 하이라이트: 이번 달부터 앞으로 가장 가까운, 배당이 잡힌 달 */}
+                      {(() => {
+                        const nowIdx = new Date().getMonth()
+                        let k = 0
+                        while (k < 12 && chartData[(nowIdx + k) % 12].monthKRW <= 0) k++
+                        if (k === 12) return null
+                        const next = chartData[(nowIdx + k) % 12]
+                        const who = symbols.filter((sym) => (next.bySymbol[sym] || 0) > 0)
+                        return (
+                          <div className="flex items-center justify-between gap-3 rounded-2xl bg-primary/5 border border-primary/20 px-4 py-3 mb-4">
+                            <div className="min-w-0">
+                              <div className="text-[11px] font-medium text-primary">{k === 0 ? "이번 달 예상 배당" : "다음 예상 배당"} · 최근 1년 같은 달 기준</div>
+                              <div className="text-sm font-semibold text-foreground truncate">
+                                {next.month} · {who.join(", ")}
+                              </div>
+                            </div>
+                            <div className="text-lg sm:text-xl font-bold text-primary tabular-nums shrink-0">
+                              ₩{Math.round(next.monthKRW).toLocaleString()}
+                            </div>
                           </div>
-                          <div className="w-28 text-right text-base font-semibold text-foreground tabular-nums">
-                            ₩{d.monthKRW.toLocaleString()}
-                          </div>
-                        </div>
-                      ))}
+                        )
+                      })()}
+
+                      {/* 배당 캘린더: 12개월 타일. 금액이 클수록 진하게(히트맵), 하단 띠는 종목별 비중 */}
+                      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+                        {chartData.map((d, idx) => {
+                          const ratio = d.monthKRW / maxMonthAmount
+                          const isNow = idx === new Date().getMonth()
+                          return (
+                            <div
+                              key={d.month}
+                              className={`relative rounded-xl border p-2.5 sm:p-3 min-h-[76px] flex flex-col justify-between transition-colors ${
+                                isNow ? "border-primary ring-1 ring-primary" : "border-border"
+                              }`}
+                              style={d.monthKRW > 0 ? { backgroundColor: `color-mix(in srgb, var(--primary) ${Math.round(5 + ratio * 20)}%, transparent)` } : undefined}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className={`text-xs font-medium ${d.monthKRW > 0 ? "text-foreground" : "text-muted-foreground/60"}`}>{d.month}</span>
+                                {isNow && <span className="text-[10px] font-semibold text-primary">이번 달</span>}
+                              </div>
+                              <div className={`text-sm sm:text-base font-bold tabular-nums truncate ${d.monthKRW > 0 ? "text-foreground" : "text-muted-foreground/40"}`}>
+                                {d.monthKRW > 0 ? `₩${Math.round(d.monthKRW).toLocaleString()}` : "–"}
+                              </div>
+                              {d.monthKRW > 0 && (
+                                <div className="flex h-1 rounded-full overflow-hidden mt-1.5">
+                                  {symbols.map((symbol) => {
+                                    const v = d.bySymbol[symbol] || 0
+                                    if (v <= 0) return null
+                                    return (
+                                      <div
+                                        key={symbol}
+                                        style={{ width: `${(v / d.monthKRW) * 100}%`, backgroundColor: COLORS[symbols.indexOf(symbol)] }}
+                                        title={`${symbol} ₩${Math.round(v).toLocaleString()}`}
+                                      />
+                                    )
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
 
                       {/* Total Summary */}
                       <div className="pt-4 mt-4 border-t border-border flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">연간 총 배당금{afterTax ? " (세후)" : ""}</span>
                         <span className="text-xl font-bold text-primary tabular-nums">₩{totalAnnual.toLocaleString()}</span>
                       </div>
+
+                      <p className="text-[11px] text-muted-foreground leading-relaxed pt-1">
+                        최근 1년 실제 배당을 배당락일이 속한 달에 표시했습니다. 실제 입금은 배당락일 이후라 다음 달로 넘어갈 수 있고, 달러 배당은 현재 환율로 환산했습니다.
+                        {noHistorySymbols.length > 0 && ` ${noHistorySymbols.join(", ")}은(는) 월별 지급 이력이 없어 이 합계에서 빠졌습니다.`}
+                      </p>
 
                       {afterTax && (
                         <p className="text-[11px] text-muted-foreground leading-relaxed pt-1">
@@ -1377,8 +1428,6 @@ export function ETFComparison() {
                     </div>
                   )
                 })()}
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
