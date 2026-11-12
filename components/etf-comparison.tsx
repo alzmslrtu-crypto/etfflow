@@ -158,6 +158,8 @@ export function ETFComparison() {
   const [displayCurrency, setDisplayCurrency] = useState<"KRW" | "USD">("KRW")
   // 세후(배당소득세 반영) 배당금 표시 여부
   const [afterTax, setAfterTax] = useState(false)
+  // 결과 카드의 12개월 막대에서 누른 달(0~11). null이면 다음 배당 달을 보여준다
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null)
 
   // 투자 시뮬레이션 상태
   const [investmentAmounts, setInvestmentAmounts] = useState<Record<string, string>>({})
@@ -717,10 +719,277 @@ export function ETFComparison() {
           )}
         </div>
 
-        {/* PC(xl 이상): 왼쪽 차트·비교표, 오른쪽 시뮬레이터 패널(스크롤해도 고정). 그 아래 폭은 기존처럼 세로로 쌓인다. */}
-        <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-6 xl:items-start">
+        {/* 결과 먼저(토스형): 결론 숫자 → 12개월 막대 → 종목별 수량. 차트·비교표는 그 아래에 둔다 */}
+        <Card className="bg-card border-border mb-6">
+          <CardContent className="p-4 sm:p-6">
+            {(() => {
+              // 요약 숫자: 종목별 (주수 × 최근 1년 1주당 배당)의 합
+              let totalInvested = 0
+              let totalDividend = 0
+              symbols.forEach((symbol) => {
+                const data = stockDataMap[symbol]
+                if (!data) return
+                const { shares } = calculateInvestment(symbol, data)
+                if (shares <= 0) return
+                totalInvested += shares * convertCurrency(data.currentPrice, data.currency, "KRW", exchangeRate)
+                totalDividend += shares * convertCurrency(data.annualDividend, data.currency, "KRW", exchangeRate) * afterTaxFactor(symbol, afterTax)
+              })
+              const portfolioYield = totalInvested > 0 ? (totalDividend / totalInvested) * 100 : 0
+
+              // 월별: 최근 1년 실제 배당을 배당락월에 배치 (5년 이력 전체를 쓰면 4~5배로 부풀려진다)
+              const chartData = Array.from({ length: 12 }, (_, idx) => {
+                const bySymbol: Record<string, number> = {}
+                let total = 0
+                symbols.forEach((symbol) => {
+                  const data = stockDataMap[symbol]
+                  const { shares } = calculateInvestment(symbol, data)
+                  if (!data?.trailingDividends || shares <= 0) return
+                  const perShare = data.trailingDividends
+                    .filter((d) => parseInt(d.date.substring(5, 7)) === idx + 1)
+                    .reduce((sum, d) => sum + d.amount, 0)
+                  const v = shares * convertCurrency(perShare, data.currency, "KRW", exchangeRate) * afterTaxFactor(symbol, afterTax)
+                  if (v > 0) {
+                    bySymbol[symbol] = v
+                    total += v
+                  }
+                })
+                return { month: idx + 1, total, bySymbol }
+              })
+              const maxMonth = Math.max(...chartData.map((d) => d.total), 1)
+              const hasMonthly = chartData.some((d) => d.total > 0)
+              // 연 배당은 있는데 지급 이력이 없는 종목(네이버 수익률로 역산)은 월별로 나눌 수 없다
+              const noHistorySymbols = symbols.filter((symbol) => {
+                const data = stockDataMap[symbol]
+                return data && data.annualDividend > 0 && calculateInvestment(symbol, data).shares > 0 &&
+                  !(data.trailingDividends?.length > 0)
+              })
+              const nowIdx = new Date().getMonth()
+              let k = 0
+              while (k < 12 && chartData[(nowIdx + k) % 12].total <= 0) k++
+              const nextIdx = k < 12 ? (nowIdx + k) % 12 : -1
+              const sel = selectedMonth ?? nextIdx
+              const selData = sel >= 0 ? chartData[sel] : null
+
+              return (
+                <>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h2 className="text-sm font-medium text-muted-foreground">예상 배당금{afterTax ? " (세후)" : ""}</h2>
+                      <div className="mt-1 flex items-baseline gap-2 flex-wrap">
+                        <span className="text-sm text-muted-foreground">매달 평균</span>
+                        <span className="text-3xl sm:text-4xl font-bold text-foreground tabular-nums">
+                          ₩{Math.round(totalDividend / 12).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-muted-foreground tabular-nums">
+                        <span className="whitespace-nowrap">연 <span className="font-semibold text-primary">₩{Math.round(totalDividend).toLocaleString()}</span></span>
+                        <span className="whitespace-nowrap">배당수익률 {portfolioYield.toFixed(2)}%</span>
+                        <span className="whitespace-nowrap">총 투자 ₩{Math.round(totalInvested).toLocaleString()}</span>
+                      </div>
+                    </div>
+                    {/* 세전/세후 토글 */}
+                    <div className="flex items-center gap-1 bg-secondary/50 rounded-lg p-1 flex-shrink-0">
+                      <Button variant={!afterTax ? "default" : "ghost"} size="sm" onClick={() => setAfterTax(false)} className="h-8 px-3 text-xs font-medium">
+                        세전
+                      </Button>
+                      <Button variant={afterTax ? "default" : "ghost"} size="sm" onClick={() => setAfterTax(true)} className="h-8 px-3 text-xs font-medium">
+                        세후
+                      </Button>
+                    </div>
+                  </div>
+
+                  {hasMonthly ? (
+                    <div className="mt-6">
+                      {/* 12개월 막대: 누르면 아래에 그 달 금액·종목별 내역 */}
+                      <div className="flex items-end gap-1 sm:gap-2 h-28">
+                        {chartData.map((d, idx) => (
+                          <button
+                            key={d.month}
+                            type="button"
+                            onClick={() => setSelectedMonth(idx)}
+                            aria-label={`${d.month}월 ₩${Math.round(d.total).toLocaleString()}`}
+                            aria-pressed={idx === sel}
+                            className="flex-1 h-full flex items-end justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                          >
+                            <span
+                              className={`w-full max-w-[36px] rounded-t-md flex flex-col-reverse overflow-hidden transition-opacity ${
+                                sel >= 0 && idx !== sel ? "opacity-45" : ""
+                              }`}
+                              style={{ height: d.total > 0 ? `${Math.max((d.total / maxMonth) * 100, 4)}%` : "3px", backgroundColor: d.total > 0 ? undefined : "var(--muted)" }}
+                            >
+                              {symbols.map((symbol) => {
+                                const v = d.bySymbol[symbol] || 0
+                                if (v <= 0) return null
+                                return (
+                                  <span
+                                    key={symbol}
+                                    className="block w-full"
+                                    style={{ height: `${(v / d.total) * 100}%`, backgroundColor: COLORS[symbols.indexOf(symbol)] }}
+                                  />
+                                )
+                              })}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex gap-1 sm:gap-2 mt-1.5">
+                        {chartData.map((d, idx) => (
+                          <div
+                            key={d.month}
+                            className={`flex-1 text-center text-[10px] sm:text-xs tabular-nums ${
+                              idx === sel ? "text-foreground font-semibold" : idx === nowIdx ? "text-primary" : "text-muted-foreground"
+                            }`}
+                          >
+                            {d.month}
+                          </div>
+                        ))}
+                      </div>
+
+                      {selData && (
+                        <div className="mt-4 rounded-xl bg-secondary/40 px-4 py-3">
+                          <div className="flex items-baseline justify-between gap-3">
+                            <span className="text-sm font-medium text-foreground">
+                              {selData.month}월{selectedMonth === null && sel === nextIdx ? (k === 0 ? " · 이번 달 예상" : " · 다음 예상 배당") : ""}
+                            </span>
+                            <span className="text-lg font-bold text-primary tabular-nums">
+                              {selData.total > 0 ? `₩${Math.round(selData.total).toLocaleString()}` : "배당 없음"}
+                            </span>
+                          </div>
+                          {selData.total > 0 && (
+                            <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
+                              {symbols.filter((symbol) => (selData.bySymbol[symbol] || 0) > 0).map((symbol) => (
+                                <span key={symbol} className="flex items-center gap-1.5 text-xs text-muted-foreground tabular-nums">
+                                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[symbols.indexOf(symbol)] }} />
+                                  {symbol} ₩{Math.round(selData.bySymbol[symbol]).toLocaleString()}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="mt-6 text-sm text-muted-foreground text-center py-6">
+                      {noHistorySymbols.length > 0
+                        ? `${noHistorySymbols.join(", ")}의 월별 배당 이력을 불러오지 못했습니다`
+                        : "아래에서 수량을 정하면 매달 받을 배당금이 보여요"}
+                    </div>
+                  )}
+
+                  {/* 종목별 수량 조절 */}
+                  <div className="mt-6 pt-5 border-t border-border">
+              {/* Stock Investment Cards - Toss Style */}
+              <div className="grid gap-2.5 md:grid-cols-2">
+                {symbols.map((symbol, index) => {
+                  const data = stockDataMap[symbol]
+                  const { shares, annualDividend, actualInvested } = calculateInvestment(symbol, data)
+                  // 1주 가격을 원화로 (한국 종목은 이미 원화이므로 환율을 곱하지 않음)
+                  const pricePerShareKRW = data?.currentPrice
+                    ? Math.round(convertCurrency(data.currentPrice, data.currency, "KRW", exchangeRate))
+                    : 0
+                  
+                  // Function to update shares directly
+                  const updateShares = (newShares: number) => {
+                    if (newShares < 0) newShares = 0
+                    const newAmount = newShares * pricePerShareKRW
+                    setInvestmentAmounts({ ...investmentAmounts, [symbol]: String(newAmount) })
+                  }
+                  
+                  return (
+                    <div
+                      key={symbol}
+                      className="rounded-xl bg-card border border-border p-3.5"
+                    >
+                      {/* Header + 수량 조절 (한 줄) */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <TickerLogo symbol={symbol} label={data?.name} size={32} fallbackColor={COLORS[index]} />
+                          <div className="min-w-0">
+                            <div className="text-sm font-semibold text-foreground leading-tight truncate">{symbol}</div>
+                            <div className="text-[11px] text-muted-foreground leading-tight">
+                              1주 ₩{pricePerShareKRW.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 수량 컨트롤 */}
+                        <div className="flex items-center gap-0.5 flex-shrink-0">
+                          <button
+                            onClick={() => updateShares(shares - 1)}
+                            disabled={shares <= 0}
+                            className="w-7 h-7 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="text"
+                            value={shares}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0
+                              updateShares(val)
+                            }}
+                            className="w-11 h-7 text-center bg-transparent text-base font-bold tabular-nums text-foreground focus:outline-none"
+                          />
+                          <button
+                            onClick={() => updateShares(shares + 1)}
+                            className="w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center text-primary transition-colors"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* 빠른 추가 (얇게) */}
+                      <div className="flex gap-1.5 mt-2.5">
+                        {[1, 5, 10, 50].map((qty) => (
+                          <button
+                            key={qty}
+                            onClick={() => updateShares(shares + qty)}
+                            className="flex-1 py-1 rounded-md bg-muted/30 hover:bg-muted/50 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            +{qty}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* 결과 (한 줄) */}
+                      {shares > 0 && (
+                        <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-border/60 text-xs">
+                          <span className="text-muted-foreground">
+                            투자 <span className="text-foreground font-semibold tabular-nums">₩{actualInvested.toLocaleString()}</span>
+                          </span>
+                          <span className="text-muted-foreground">
+                            연 배당{afterTax ? "(세후)" : ""}{" "}
+                            <span className="text-primary font-bold tabular-nums text-sm">
+                              ₩{Math.round(annualDividend * afterTaxFactor(symbol, afterTax)).toLocaleString()}
+                            </span>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+                  </div>
+
+                  <p className="mt-4 text-[11px] text-muted-foreground leading-relaxed">
+                    최근 1년 실제 배당을 배당락일이 속한 달에 표시했습니다. 실제 입금은 배당락일 이후라 다음 달로 넘어갈 수 있고, 달러 배당은 현재 환율로 환산했습니다.
+                    {noHistorySymbols.length > 0 && ` ${noHistorySymbols.join(", ")}은(는) 월별 지급 이력이 없어 월별 막대에서 빠졌습니다.`}
+                    {afterTax && " 세후: 국내 상장 15.4%, 미국 상장 현지 원천징수 15% 적용(개략치), 금융소득종합과세 미반영."}
+                  </p>
+                </>
+              )
+            })()}
+          </CardContent>
+        </Card>
+
         {/* Chart Section */}
-        <Card className="bg-card border-border mb-8 xl:mb-0">
+        <Card className="bg-card border-border">
           <CardContent className="p-3 sm:p-6">
             {/* Chart Controls */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 pb-4 border-b border-border">
@@ -1080,354 +1349,6 @@ export function ETFComparison() {
                 </table>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Unified Investment Simulator + Monthly Dividend */}
-        <Card className="bg-card border-border mt-6 xl:mt-0 xl:sticky xl:top-20">
-          <CardContent className="p-3 sm:p-6">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 pb-4 border-b border-border gap-3">
-              <div>
-                <h2 className="text-base font-semibold text-foreground mb-2">투자 시뮬레이션 · 예상 배당금</h2>
-                <p className="text-xs text-muted-foreground hidden sm:block">종목별 투자금액을 입력하면 월별 예상 배당금이 실시간으로 반영됩니다</p>
-              </div>
-              {/* 세전/세후 토글 */}
-              <div className="flex items-center gap-1 bg-secondary/50 rounded-lg p-1 flex-shrink-0">
-                <Button
-                  variant={!afterTax ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setAfterTax(false)}
-                  className="h-8 px-3 text-xs font-medium"
-                >
-                  세전
-                </Button>
-                <Button
-                  variant={afterTax ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setAfterTax(true)}
-                  className="h-8 px-3 text-xs font-medium"
-                >
-                  세후
-                </Button>
-              </div>
-            </div>
-
-            {/* Investment Simulation - Toss Style with Quantity Control */}
-            <div className="space-y-6">
-              {/* Portfolio Summary Bar - 결론 숫자 모음 */}
-              {(() => {
-                let totalInvested = 0
-                let totalDividend = 0
-                symbols.forEach((symbol) => {
-                  const data = stockDataMap[symbol]
-                  if (!data) return
-                  const { shares } = calculateInvestment(symbol, data)
-                  if (shares <= 0) return
-                  totalInvested += shares * convertCurrency(data.currentPrice, data.currency, "KRW", exchangeRate)
-                  totalDividend += shares * convertCurrency(data.annualDividend, data.currency, "KRW", exchangeRate) * afterTaxFactor(symbol, afterTax)
-                })
-                totalInvested = Math.round(totalInvested)
-                totalDividend = Math.round(totalDividend)
-                const portfolioYield = totalInvested > 0 ? (totalDividend / totalInvested) * 100 : 0
-                const monthlyAvg = Math.round(totalDividend / 12)
-
-                const items = [
-                  { label: "총 투자금액", value: `₩${totalInvested.toLocaleString()}`, accent: false },
-                  { label: "연 예상 배당금", value: `₩${totalDividend.toLocaleString()}`, accent: true },
-                  { label: "배당수익률", value: `${portfolioYield.toFixed(2)}%`, accent: false },
-                  { label: "월 평균", value: `₩${monthlyAvg.toLocaleString()}`, accent: false },
-                ]
-
-                return (
-                  <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-2 gap-2 sm:gap-3">
-                    {items.map((it) => (
-                      <div
-                        key={it.label}
-                        className={`rounded-xl p-3 sm:p-4 border ${it.accent ? "bg-primary/5 border-primary/20" : "bg-secondary/30 border-border"}`}
-                      >
-                        <div className="text-[11px] sm:text-xs text-muted-foreground mb-1">{it.label}</div>
-                        <div className={`text-base sm:text-xl font-bold tabular-nums truncate ${it.accent ? "text-primary" : "text-foreground"}`}>
-                          {it.value}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )
-              })()}
-
-              {/* Stock Investment Cards - Toss Style */}
-              <div className="space-y-2.5">
-                {symbols.map((symbol, index) => {
-                  const data = stockDataMap[symbol]
-                  const { shares, annualDividend, actualInvested } = calculateInvestment(symbol, data)
-                  // 1주 가격을 원화로 (한국 종목은 이미 원화이므로 환율을 곱하지 않음)
-                  const pricePerShareKRW = data?.currentPrice
-                    ? Math.round(convertCurrency(data.currentPrice, data.currency, "KRW", exchangeRate))
-                    : 0
-                  
-                  // Function to update shares directly
-                  const updateShares = (newShares: number) => {
-                    if (newShares < 0) newShares = 0
-                    const newAmount = newShares * pricePerShareKRW
-                    setInvestmentAmounts({ ...investmentAmounts, [symbol]: String(newAmount) })
-                  }
-                  
-                  return (
-                    <div
-                      key={symbol}
-                      className="rounded-xl bg-card border border-border p-3.5"
-                    >
-                      {/* Header + 수량 조절 (한 줄) */}
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <TickerLogo symbol={symbol} label={data?.name} size={32} fallbackColor={COLORS[index]} />
-                          <div className="min-w-0">
-                            <div className="text-sm font-semibold text-foreground leading-tight truncate">{symbol}</div>
-                            <div className="text-[11px] text-muted-foreground leading-tight">
-                              1주 ₩{pricePerShareKRW.toLocaleString()}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 수량 컨트롤 */}
-                        <div className="flex items-center gap-0.5 flex-shrink-0">
-                          <button
-                            onClick={() => updateShares(shares - 1)}
-                            disabled={shares <= 0}
-                            className="w-7 h-7 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
-                            </svg>
-                          </button>
-                          <input
-                            type="text"
-                            value={shares}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0
-                              updateShares(val)
-                            }}
-                            className="w-11 h-7 text-center bg-transparent text-base font-bold tabular-nums text-foreground focus:outline-none"
-                          />
-                          <button
-                            onClick={() => updateShares(shares + 1)}
-                            className="w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center text-primary transition-colors"
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* 빠른 추가 (얇게) */}
-                      <div className="flex gap-1.5 mt-2.5">
-                        {[1, 5, 10, 50].map((qty) => (
-                          <button
-                            key={qty}
-                            onClick={() => updateShares(shares + qty)}
-                            className="flex-1 py-1 rounded-md bg-muted/30 hover:bg-muted/50 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            +{qty}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* 결과 (한 줄) */}
-                      {shares > 0 && (
-                        <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-border/60 text-xs">
-                          <span className="text-muted-foreground">
-                            투자 <span className="text-foreground font-semibold tabular-nums">₩{actualInvested.toLocaleString()}</span>
-                          </span>
-                          <span className="text-muted-foreground">
-                            연 배당{afterTax ? "(세후)" : ""}{" "}
-                            <span className="text-primary font-bold tabular-nums text-sm">
-                              ₩{Math.round(annualDividend * afterTaxFactor(symbol, afterTax)).toLocaleString()}
-                            </span>
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-
-            </div>
-          </CardContent>
-        </Card>
-        </div>
-
-        {/* 월별 예상 배당: 화면 폭 전체 사용 (PC 옆 패널 안에 두면 패널 속 스크롤이 생겨 불편했다) */}
-        <Card className="bg-card border-border mt-6">
-          <CardContent className="p-3 sm:p-6">
-                <h2 className="text-base font-semibold text-foreground mb-5">배당금은 이렇게 들어와요</h2>
-                {(() => {
-                  const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
-                  const chartData = months.map((month, idx) => {
-                    const bySymbol: Record<string, number> = {}
-                    let monthKRWTotal = 0
-                    symbols.forEach((symbol) => {
-                      const data = stockDataMap[symbol]
-                      const { shares } = calculateInvestment(symbol, data)
-                      if (data?.trailingDividends && shares > 0) {
-                        // 최근 1년 배당만 쓴다(위 요약의 연 예상 배당금과 같은 근거). 5년 이력 전체를 쓰면 4~5배로 부풀려진다.
-                        const dividendPerShare = data.trailingDividends
-                          .filter(d => parseInt(d.date.substring(5, 7)) === idx + 1)
-                          .reduce((sum, d) => sum + d.amount, 0)
-                        // 종목별 통화를 원화로 환산 (한국 종목은 이미 원화) + 세후 반영
-                        const dividendKRW = convertCurrency(dividendPerShare, data.currency, "KRW", exchangeRate)
-                        const symbolKRW = shares * dividendKRW * afterTaxFactor(symbol, afterTax)
-                        if (symbolKRW > 0) {
-                          bySymbol[symbol] = symbolKRW
-                          monthKRWTotal += symbolKRW
-                        }
-                      }
-                    })
-                    return { month, monthKRW: monthKRWTotal, bySymbol }
-                  })
-
-                  // 배당이 있는 종목만 범례에 표시
-                  const contributingSymbols = symbols.filter((symbol) =>
-                    chartData.some((d) => (d.bySymbol[symbol] || 0) > 0),
-                  )
-
-                  const monthsWithDividend = chartData.filter(d => d.monthKRW > 0)
-                  // 반올림 전 값을 합산해야 위 요약 카드의 연 예상 배당금과 원 단위까지 맞는다.
-                  const totalAnnual = Math.round(chartData.reduce((sum, d) => sum + d.monthKRW, 0))
-                  // 연 배당은 있는데 지급 이력이 없는 종목(네이버 수익률로 역산한 경우)은 월별로 나눌 수 없다.
-                  const noHistorySymbols = symbols.filter((symbol) => {
-                    const data = stockDataMap[symbol]
-                    return data && data.annualDividend > 0 && calculateInvestment(symbol, data).shares > 0 &&
-                      !(data.trailingDividends?.length > 0)
-                  })
-                  const maxMonthAmount = Math.max(...chartData.map(d => d.monthKRW), 1)
-                  const monthsCount = monthsWithDividend.length
-
-                  if (monthsWithDividend.length === 0) {
-                    return (
-                      <div className="text-sm text-muted-foreground text-center py-8">
-                        {noHistorySymbols.length > 0
-                          ? `${noHistorySymbols.join(", ")}의 월별 배당 이력을 불러오지 못했습니다`
-                          : "투자 금액을 입력하면 배당금을 확인할 수 있어요"}
-                      </div>
-                    )
-                  }
-
-                  return (
-                    <div className="space-y-3">
-                      {/* Schedule label + 종목별 색상 범례 */}
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                        <div className="text-xs font-medium text-foreground">
-                          {(() => {
-                            const dividendMonths = monthsWithDividend.map(d => {
-                              const dateStr = d.month
-                              const monthNum = parseInt(dateStr.substring(0, dateStr.indexOf('월')))
-                              return monthNum
-                            })
-
-                            // 월배당 ETF도 배당락일이 12/31이면 1월분이 12월에 잡혀 11개월로 보인다.
-                            // 개월 수로 추정하지 말고 종목의 실제 지급 주기로 판정한다.
-                            const freqs = contributingSymbols.map((sym) => stockDataMap[sym]?.yearlyDividendCount ?? 0)
-                            if (monthsCount === 12 || (freqs.length > 0 && freqs.every((f) => f >= 12))) return "매월 배당"
-                            if (freqs.length > 0 && freqs.every((f) => f === 4) && monthsCount === 4) return "분기 배당"
-                            return `${dividendMonths.length}개월 배당`
-                          })()}
-                        </div>
-                        {contributingSymbols.length > 1 && (
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                            {contributingSymbols.map((symbol) => (
-                              <span key={symbol} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[symbols.indexOf(symbol)] }} />
-                                {symbol}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 다음 배당 하이라이트: 이번 달부터 앞으로 가장 가까운, 배당이 잡힌 달 */}
-                      {(() => {
-                        const nowIdx = new Date().getMonth()
-                        let k = 0
-                        while (k < 12 && chartData[(nowIdx + k) % 12].monthKRW <= 0) k++
-                        if (k === 12) return null
-                        const next = chartData[(nowIdx + k) % 12]
-                        const who = symbols.filter((sym) => (next.bySymbol[sym] || 0) > 0)
-                        return (
-                          <div className="flex items-center justify-between gap-3 rounded-2xl bg-primary/5 border border-primary/20 px-4 py-3 mb-4">
-                            <div className="min-w-0">
-                              <div className="text-[11px] font-medium text-primary">{k === 0 ? "이번 달 예상 배당" : "다음 예상 배당"} · 최근 1년 같은 달 기준</div>
-                              <div className="text-sm font-semibold text-foreground truncate">
-                                {next.month} · {who.join(", ")}
-                              </div>
-                            </div>
-                            <div className="text-lg sm:text-xl font-bold text-primary tabular-nums shrink-0">
-                              ₩{Math.round(next.monthKRW).toLocaleString()}
-                            </div>
-                          </div>
-                        )
-                      })()}
-
-                      {/* 배당 캘린더: 12개월 타일. 금액이 클수록 진하게(히트맵), 하단 띠는 종목별 비중 */}
-                      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
-                        {chartData.map((d, idx) => {
-                          const ratio = d.monthKRW / maxMonthAmount
-                          const isNow = idx === new Date().getMonth()
-                          return (
-                            <div
-                              key={d.month}
-                              className={`relative rounded-xl border p-2.5 sm:p-3 min-h-[76px] flex flex-col justify-between transition-colors ${
-                                isNow ? "border-primary ring-1 ring-primary" : "border-border"
-                              }`}
-                              style={d.monthKRW > 0 ? { backgroundColor: `color-mix(in srgb, var(--primary) ${Math.round(5 + ratio * 20)}%, transparent)` } : undefined}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className={`text-xs font-medium ${d.monthKRW > 0 ? "text-foreground" : "text-muted-foreground/60"}`}>{d.month}</span>
-                                {isNow && <span className="text-[10px] font-semibold text-primary">이번 달</span>}
-                              </div>
-                              <div className={`text-sm sm:text-base font-bold tabular-nums truncate ${d.monthKRW > 0 ? "text-foreground" : "text-muted-foreground/40"}`}>
-                                {d.monthKRW > 0 ? `₩${Math.round(d.monthKRW).toLocaleString()}` : "–"}
-                              </div>
-                              {d.monthKRW > 0 && (
-                                <div className="flex h-1 rounded-full overflow-hidden mt-1.5">
-                                  {symbols.map((symbol) => {
-                                    const v = d.bySymbol[symbol] || 0
-                                    if (v <= 0) return null
-                                    return (
-                                      <div
-                                        key={symbol}
-                                        style={{ width: `${(v / d.monthKRW) * 100}%`, backgroundColor: COLORS[symbols.indexOf(symbol)] }}
-                                        title={`${symbol} ₩${Math.round(v).toLocaleString()}`}
-                                      />
-                                    )
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-
-                      {/* Total Summary */}
-                      <div className="pt-4 mt-4 border-t border-border flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">연간 총 배당금{afterTax ? " (세후)" : ""}</span>
-                        <span className="text-xl font-bold text-primary tabular-nums">₩{totalAnnual.toLocaleString()}</span>
-                      </div>
-
-                      <p className="text-[11px] text-muted-foreground leading-relaxed pt-1">
-                        최근 1년 실제 배당을 배당락일이 속한 달에 표시했습니다. 실제 입금은 배당락일 이후라 다음 달로 넘어갈 수 있고, 달러 배당은 현재 환율로 환산했습니다.
-                        {noHistorySymbols.length > 0 && ` ${noHistorySymbols.join(", ")}은(는) 월별 지급 이력이 없어 이 합계에서 빠졌습니다.`}
-                      </p>
-
-                      {afterTax && (
-                        <p className="text-[11px] text-muted-foreground leading-relaxed pt-1">
-                          세후 기준: 국내 상장 ETF 배당소득세 15.4%, 미국 상장 ETF 현지 원천징수 15% 적용(개략치). 금융소득종합과세·환율 등은 미반영이며 실제와 차이가 있을 수 있습니다.
-                        </p>
-                      )}
-                    </div>
-                  )
-                })()}
           </CardContent>
         </Card>
       </div>
