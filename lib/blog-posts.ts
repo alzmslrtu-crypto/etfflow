@@ -48,7 +48,7 @@ export const blogPosts = [
 
 *배당률·세율은 변동·개정될 수 있으며 본 글은 정보 제공 목적입니다. 투자·세무 자문이 아닙니다.*
     `,
-    category: '수익 분석',
+    category: '배당·절세',
     date: '2026-06-15',
     readTime: 7,
   },
@@ -369,7 +369,7 @@ export const blogPosts = [
 
 *본 글은 정보 제공 목적이며 투자 권유가 아닙니다. 종목·수익률은 예시이며 실제와 다를 수 있습니다.*
     `,
-    category: '생활 설계',
+    category: '배당·절세',
     date: '2026-06-11',
     readTime: 8,
   },
@@ -444,7 +444,7 @@ FIRE(Financial Independence, Retire Early)는 "근로소득 없이도 생활이 
 
 *본 글은 정보 제공 목적이며 투자 권유가 아닙니다.*
     `,
-    category: '생활 설계',
+    category: '배당·절세',
     date: '2026-06-11',
     readTime: 9,
   },
@@ -517,7 +517,7 @@ FIRE(Financial Independence, Retire Early)는 "근로소득 없이도 생활이 
 
 *세법은 개정될 수 있으며, 구체적 적용은 세무 전문가와 상담하세요. 본 글은 투자 권유가 아닙니다.*
     `,
-    category: '절세 가이드',
+    category: '배당·절세',
     date: '2026-06-11',
     readTime: 7,
   },
@@ -650,7 +650,7 @@ FIRE(Financial Independence, Retire Early)는 "근로소득 없이도 생활이 
 
 *본 글은 정보 제공 목적이며 투자 권유가 아닙니다.*
     `,
-    category: '한국 ETF',
+    category: 'ETF 비교',
     date: '2026-06-11',
     readTime: 6,
   },
@@ -716,7 +716,7 @@ ETF Flow에서는 위 종목들을 **검색해서 한 화면에서 비교**하�
 
 *본 글은 정보 제공 목적이며 투자 권유가 아닙니다. 모든 투자 결정과 책임은 본인에게 있습니다.*
     `,
-    category: '한국 ETF',
+    category: 'ETF 비교',
     date: '2026-06-10',
     readTime: 8,
   },
@@ -924,7 +924,7 @@ YOC(Yield on Cost)는 **내가 산 가격 기준** 배당수익률입니다. 배
 
 *본 글은 정보 제공 목적이며 투자 권유가 아닙니다.*
     `,
-    category: '수익 분석',
+    category: '배당·절세',
     date: '2026-06-10',
     readTime: 6,
   },
@@ -994,7 +994,7 @@ YOC(Yield on Cost)는 **내가 산 가격 기준** 배당수익률입니다. 배
 
 *배당 일정은 운용사 사정에 따라 달라질 수 있으며, 본 글은 정보 제공 목적입니다.*
     `,
-    category: '배당 관리',
+    category: '배당·절세',
     date: '2026-06-10',
     readTime: 6,
   },
@@ -1398,7 +1398,7 @@ ETF Flow에서 QQQ와 QQQM의 실시간 성과를 비교해보세요!
 
 ETF Flow에서 나만의 배당 포트폴리오를 설계해보세요!
     `,
-    category: '포트폴리오',
+    category: '배당·절세',
     date: '2026-06-10',
     readTime: 10,
   },
@@ -1572,7 +1572,7 @@ A: 배당락일과 관계없이 장기 투자 관점에서 꾸준히 매수하�
 
 ETF Flow에서 SCHD의 실시간 데이터와 배당 정보를 확인해보세요!
     `,
-    category: 'ETF 분석',
+    category: 'ETF 비교',
     date: '2026-06-10',
     readTime: 12,
   },
@@ -1748,7 +1748,7 @@ ETF의 구조, 위험, 비용을 이해하지 못하고 투자합니다.
 
 ETF Flow에서 현명한 ETF 투자를 시작해보세요!
     `,
-    category: '투자 가이드',
+    category: '초보자 가이드',
     date: '2026-06-10',
     readTime: 11,
   },
@@ -1923,7 +1923,7 @@ A: 네, 배당락일에 주가가 배당금만큼 하락하므로 배당수익�
 
 ETF Flow에서 다양한 ETF의 실시간 배당수익률을 확인해보세요!
     `,
-    category: '투자 교육',
+    category: '초보자 가이드',
     date: '2026-06-10',
     readTime: 10,
   },
@@ -2414,7 +2414,7 @@ QYLD처럼 콜옵션을 매도하는 커버드콜은 주가가 크게 오를 때
 
 목적에 맞는 월배당 ETF를 선택하되, 배당률보다 총수익을 먼저 보자. 세 ETF의 실제 성과는 [ETF 비교 도구](/)에서 비교할 수 있다.
     `,
-    category: 'ETF 분석',
+    category: 'ETF 비교',
     date: '2026-06-10',
     readTime: 10,
   },
@@ -2519,7 +2519,7 @@ QYLD처럼 콜옵션을 매도하는 커버드콜은 주가가 크게 오를 때
 
 세금 구조를 이해하면 같은 수익률이라도 실수령액을 크게 바꿀 수 있다. 먼저 [배당소득세 계산기](/tools/tax)로 내 배당의 세후 금액부터 확인해 보자.
     `,
-    category: '투자 교육',
+    category: '초보자 가이드',
     date: '2026-06-10',
     readTime: 8,
   },
@@ -2623,7 +2623,7 @@ YOC는 보유 기간이 길수록 자연히 올라가는 지표라, 종목 간 �
 
 자신의 투자 기간에 맞게 선택하는 것이 핵심이다. [배당수익률 계산기](/tools/dividend-yield)로 내 YOC 곡선을 그려 보자.
     `,
-    category: '투자 교육',
+    category: '초보자 가이드',
     date: '2026-06-10',
     readTime: 9,
   },
@@ -2729,7 +2729,7 @@ ETF 수익률과 기초지수 수익률의 차이입니다.
 
 ETF를 고를 땐 운용보수와 추적차이를 함께 보자. 같은 지수 ETF들의 수익률 차이는 [ETF 비교 도구](/)에서 직접 확인할 수 있다.
     `,
-    category: '투자 교육',
+    category: '초보자 가이드',
     date: '2026-06-10',
     readTime: 7,
   },
