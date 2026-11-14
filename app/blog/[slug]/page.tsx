@@ -6,6 +6,31 @@ import type { Metadata } from 'next'
 import { AUTHOR } from '@/lib/author'
 import { AdFit } from '@/components/adfit'
 
+// 본문에 언급된 ETF의 운용사 공식 페이지 (2026-11-14 접속 확인)
+const ETF_SOURCES: Record<string, string> = {
+  SCHD: 'https://www.schwabassetmanagement.com/products/schd',
+  JEPI: 'https://am.jpmorgan.com/us/en/asset-management/adv/products/jpmorgan-equity-premium-income-etf-etf-shares-46641q332',
+  JEPQ: 'https://am.jpmorgan.com/us/en/asset-management/adv/products/jpmorgan-nasdaq-equity-premium-income-etf-etf-shares-46654q203',
+  VOO: 'https://investor.vanguard.com/investment-products/etfs/profile/voo',
+  VYM: 'https://investor.vanguard.com/investment-products/etfs/profile/vym',
+  VTI: 'https://investor.vanguard.com/investment-products/etfs/profile/vti',
+  VIG: 'https://investor.vanguard.com/investment-products/etfs/profile/vig',
+  BND: 'https://investor.vanguard.com/investment-products/etfs/profile/bnd',
+  VXUS: 'https://investor.vanguard.com/investment-products/etfs/profile/vxus',
+  QQQ: 'https://www.invesco.com/qqq-etf/en/home.html',
+  QQQM: 'https://www.invesco.com/us/en/financial-products/etfs/invesco-nasdaq-100-etf.html',
+  SPHD: 'https://www.invesco.com/us/en/financial-products/etfs/invesco-sp-500-high-dividend-low-volatility-etf.html',
+  SPY: 'https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy',
+  SPYD: 'https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-portfolio-sp-500-high-dividend-etf-spyd',
+  QYLD: 'https://www.globalxetfs.com/funds/qyld/',
+  HDV: 'https://www.ishares.com/us/products/239563/ishares-core-high-dividend-etf',
+  IVV: 'https://www.ishares.com/us/products/239726/ishares-core-sp-500-etf',
+  DGRO: 'https://www.ishares.com/us/products/264623/ishares-core-dividend-growth-etf',
+  DIVO: 'https://amplifyetfs.com/divo/',
+  NOBL: 'https://www.proshares.com/our-etfs/strategic/nobl',
+  DGRW: 'https://www.wisdomtree.com/investments/etfs/equity/dgrw',
+}
+
 // Generate static params for all blog posts
 export function generateStaticParams() {
   return blogPosts.map((post) => ({
@@ -250,6 +275,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const sameCat = blogPosts.filter((p) => p.slug !== post.slug && p.category === post.category)
   const others = blogPosts.filter((p) => p.slug !== post.slug && p.category !== post.category)
   const related = [...sameCat, ...others].slice(0, 4)
+  const sources = Object.keys(ETF_SOURCES).filter((t) => new RegExp(`\\b${t}\\b`).test(post.content))
 
   const url = `https://www.etfflow.kr/blog/${post.slug}`
   const jsonLd = {
@@ -258,7 +284,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     headline: post.title,
     description: post.excerpt,
     datePublished: post.date,
-    dateModified: post.date,
+    dateModified: post.updated ?? post.date,
     inLanguage: 'ko-KR',
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     author: {
@@ -303,6 +329,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               <span className="inline-flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 {formatDate(post.date)}
+                {post.updated && ` (수정 ${formatDate(post.updated)})`}
               </span>
               <span className="inline-flex items-center gap-1">
                 <Clock className="w-4 h-4" />
@@ -337,6 +364,28 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               </>
             )
           })()}
+
+          {/* 데이터 기준과 출처 */}
+          {sources.length > 0 && (
+            <section className="mt-12 pt-8 border-t border-border">
+              <div className="rounded-2xl bg-secondary/30 p-5 text-sm text-muted-foreground leading-relaxed">
+                <div className="font-bold text-foreground mb-2">데이터 기준과 출처</div>
+                <p>
+                  본문의 수익률·배당 수치는 작성·수정 시점(최종 수정 {formatDate(post.updated ?? post.date)})의 값이며,
+                  이후 달라질 수 있습니다. 최신 보수·분배금·보유 종목은 아래 운용사 공식 페이지에서 확인하세요.
+                </p>
+                <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+                  {sources.map((t) => (
+                    <li key={t}>
+                      <a href={ETF_SOURCES[t]} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        {t} 공식 페이지
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          )}
 
           {/* 이 글을 쓴 사람 (E-E-A-T 신뢰 신호) */}
           <section className="mt-12 pt-8 border-t border-border">

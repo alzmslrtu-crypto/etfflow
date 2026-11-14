@@ -50,6 +50,7 @@ export const blogPosts = [
     `,
     category: '배당·절세',
     date: '2026-06-15',
+    updated: '2026-11-12',
     readTime: 7,
   },
   {
@@ -115,6 +116,7 @@ export const blogPosts = [
     `,
     category: '투자 전략',
     date: '2026-06-11',
+    updated: '2026-07-08',
     readTime: 7,
   },
   {
@@ -180,6 +182,7 @@ export const blogPosts = [
     `,
     category: '투자 전략',
     date: '2026-06-11',
+    updated: '2026-07-08',
     readTime: 7,
   },
   {
@@ -240,6 +243,7 @@ export const blogPosts = [
     `,
     category: '투자 전략',
     date: '2026-06-11',
+    updated: '2026-07-08',
     readTime: 7,
   },
   {
@@ -301,6 +305,7 @@ export const blogPosts = [
     `,
     category: 'ETF 비교',
     date: '2026-06-11',
+    updated: '2026-07-08',
     readTime: 8,
   },
   {
@@ -371,6 +376,7 @@ export const blogPosts = [
     `,
     category: '배당·절세',
     date: '2026-06-11',
+    updated: '2026-11-12',
     readTime: 8,
   },
   {
@@ -446,6 +452,7 @@ FIRE(Financial Independence, Retire Early)는 "근로소득 없이도 생활이 
     `,
     category: '배당·절세',
     date: '2026-06-11',
+    updated: '2026-07-08',
     readTime: 9,
   },
   {
@@ -519,6 +526,7 @@ FIRE(Financial Independence, Retire Early)는 "근로소득 없이도 생활이 
     `,
     category: '배당·절세',
     date: '2026-06-11',
+    updated: '2026-11-12',
     readTime: 7,
   },
   {
@@ -578,6 +586,7 @@ FIRE(Financial Independence, Retire Early)는 "근로소득 없이도 생활이 
     `,
     category: '초보자 가이드',
     date: '2026-06-11',
+    updated: '2026-07-08',
     readTime: 8,
   },
   {
@@ -652,6 +661,7 @@ FIRE(Financial Independence, Retire Early)는 "근로소득 없이도 생활이 
     `,
     category: 'ETF 비교',
     date: '2026-06-11',
+    updated: '2026-07-08',
     readTime: 6,
   },
   {
@@ -779,6 +789,7 @@ ETF(Exchange Traded Fund, 상장지수펀드)는 여러 종목을 담은 펀드�
     `,
     category: '초보자 가이드',
     date: '2026-06-10',
+    updated: '2026-11-05',
     readTime: 5,
   },
   {
@@ -861,6 +872,7 @@ JEPI의 높은 분배율은 커버드콜 옵션 프리미엄에서 나오며, �
     `,
     category: 'ETF 비교',
     date: '2026-06-10',
+    updated: '2026-11-12',
     readTime: 7,
   },
   {
@@ -926,6 +938,7 @@ YOC(Yield on Cost)는 **내가 산 가격 기준** 배당수익률입니다. 배
     `,
     category: '배당·절세',
     date: '2026-06-10',
+    updated: '2026-11-05',
     readTime: 6,
   },
   {
@@ -996,6 +1009,7 @@ YOC(Yield on Cost)는 **내가 산 가격 기준** 배당수익률입니다. 배
     `,
     category: '배당·절세',
     date: '2026-06-10',
+    updated: '2026-11-05',
     readTime: 6,
   },
   {
@@ -1101,6 +1115,7 @@ ETF Flow에서 두 ETF의 실시간 데이터를 비교해보세요!
     `,
     category: 'ETF 비교',
     date: '2026-06-10',
+    updated: '2026-11-05',
     readTime: 8,
   },
   {
@@ -1222,6 +1237,7 @@ ETF Flow에서 QQQ와 QQQM의 실시간 성과를 비교해보세요!
     `,
     category: 'ETF 비교',
     date: '2026-06-10',
+    updated: '2026-11-05',
     readTime: 8,
   },
   {
@@ -1400,6 +1416,7 @@ ETF Flow에서 나만의 배당 포트폴리오를 설계해보세요!
     `,
     category: '배당·절세',
     date: '2026-06-10',
+    updated: '2026-11-05',
     readTime: 10,
   },
   {
@@ -1574,6 +1591,7 @@ ETF Flow에서 SCHD의 실시간 데이터와 배당 정보를 확인해보세�
     `,
     category: 'ETF 비교',
     date: '2026-06-10',
+    updated: '2026-11-12',
     readTime: 12,
   },
   {
@@ -1750,6 +1768,7 @@ ETF Flow에서 현명한 ETF 투자를 시작해보세요!
     `,
     category: '초보자 가이드',
     date: '2026-06-10',
+    updated: '2026-11-05',
     readTime: 11,
   },
   {
@@ -1925,6 +1944,7 @@ ETF Flow에서 다양한 ETF의 실시간 배당수익률을 확인해보세요!
     `,
     category: '초보자 가이드',
     date: '2026-06-10',
+    updated: '2026-11-12',
     readTime: 10,
   },
   {
@@ -2014,6 +2034,7 @@ VOO(코어)와 QQQ(새틀라이트)처럼 대형 기술주가 많이 겹치면 �
     `,
     category: '투자 전략',
     date: '2026-06-10',
+    updated: '2026-11-12',
     readTime: 8,
   },
   {
@@ -2112,6 +2133,7 @@ VOO(코어)와 QQQ(새틀라이트)처럼 대형 기술주가 많이 겹치면 �
     `,
     category: '투자 전략',
     date: '2026-06-10',
+    updated: '2026-11-05',
     readTime: 7,
   },
   {
@@ -2216,6 +2238,7 @@ DRIP의 힘은 '세후 재투자 원금'을 얼마나 지키느냐에 달려 있
     `,
     category: '투자 전략',
     date: '2026-06-10',
+    updated: '2026-11-05',
     readTime: 8,
   },
   {
@@ -2307,6 +2330,7 @@ DRIP의 힘은 '세후 재투자 원금'을 얼마나 지키느냐에 달려 있
     `,
     category: '투자 전략',
     date: '2026-06-10',
+    updated: '2026-11-12',
     readTime: 9,
   },
   {
@@ -2416,6 +2440,7 @@ QYLD처럼 콜옵션을 매도하는 커버드콜은 주가가 크게 오를 때
     `,
     category: 'ETF 비교',
     date: '2026-06-10',
+    updated: '2026-11-12',
     readTime: 10,
   },
   {
@@ -2521,6 +2546,7 @@ QYLD처럼 콜옵션을 매도하는 커버드콜은 주가가 크게 오를 때
     `,
     category: '초보자 가이드',
     date: '2026-06-10',
+    updated: '2026-11-12',
     readTime: 8,
   },
   {
@@ -2625,6 +2651,7 @@ YOC는 보유 기간이 길수록 자연히 올라가는 지표라, 종목 간 �
     `,
     category: '초보자 가이드',
     date: '2026-06-10',
+    updated: '2026-11-12',
     readTime: 9,
   },
   {
@@ -2731,6 +2758,7 @@ ETF를 고를 땐 운용보수와 추적차이를 함께 보자. 같은 지수 E
     `,
     category: '초보자 가이드',
     date: '2026-06-10',
+    updated: '2026-11-05',
     readTime: 7,
   },
   {
@@ -2830,6 +2858,7 @@ ETF를 고를 땐 운용보수와 추적차이를 함께 보자. 같은 지수 E
     `,
     category: '투자 전략',
     date: '2026-06-10',
+    updated: '2026-11-12',
     readTime: 8,
   },
   {

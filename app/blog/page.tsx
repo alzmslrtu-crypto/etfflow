@@ -14,12 +14,9 @@ export const metadata: Metadata = {
 // 교육 허브 카테고리 순서·설명
 const CATEGORY_ORDER: { name: string; desc: string }[] = [
   { name: '초보자 가이드', desc: '배당 ETF가 처음이라면 여기부터' },
-  { name: 'ETF 비교', desc: '인기 ETF를 항목별로 비교 분석' },
-  { name: '한국 ETF', desc: '국내 상장 배당·월배당 ETF 정보' },
-  { name: '절세 가이드', desc: '배당소득세·연금·ISA 절세 전략' },
-  { name: '생활 설계', desc: '월 배당 목표·FIRE·은퇴 인컴 설계' },
-  { name: '수익 분석', desc: '배당금·수익률 계산과 분석' },
+  { name: 'ETF 비교', desc: '미국·국내 상장 인기 ETF를 항목별로 비교 분석' },
   { name: '투자 전략', desc: '포트폴리오 구성과 재투자 전략' },
+  { name: '배당·절세', desc: '배당금 계산·세금·계좌 선택·월 배당 목표 설계' },
 ]
 
 export default function Blog() {
